@@ -23,6 +23,93 @@ async function verifyCloudflareTurnstile(token, ip) {
   }
 }
 
+const FORBIDDEN_PATTERNS = [
+  /gitler/i,
+  /hitler/i,
+  /гитлер/i,
+  /nazi/i,
+  /нацист/i,
+  /фашист/i,
+  /fascist/i,
+  /fuhrer/i,
+  /f[uü]hrer/i,
+  /фюрер/i,
+  /ху[йеяиёю]/i,
+  /xui/i,
+  /huy/i,
+  /xyi/i,
+  /пизд/i,
+  /pizd/i,
+  /пезд/i,
+  /еба[тьнл]/i,
+  /еб[аёе]/i,
+  /ёб[ануты]/i,
+  /ebat/i,
+  /ebal/i,
+  /eblan/i,
+  /бля[тд]/i,
+  /blya/i,
+  /blyad/i,
+  /мудак/i,
+  /мудил/i,
+  /mudak/i,
+  /сука/i,
+  /сучк/i,
+  /suka/i,
+  /гандон/i,
+  /gandon/i,
+  /залуп/i,
+  /zalup/i,
+  /чмо/i,
+  /fuck/i,
+  /bitch/i,
+  /cunt/i,
+  /dick/i,
+  /cock/i,
+  /pussy/i,
+  /nigger/i,
+  /nigga/i,
+  /whore/i,
+  /slut/i
+];
+
+function containsForbiddenWord(str) {
+  if (!str) return false;
+  const raw = String(str).toLowerCase();
+  for (const regex of FORBIDDEN_PATTERNS) {
+    if (regex.test(raw)) return true;
+  }
+  const normalized = raw
+    .replace(/[@4]/g, 'a')
+    .replace(/[0]/g, 'o')
+    .replace(/[1!|]/g, 'i')
+    .replace(/[3]/g, 'e')
+    .replace(/[$5]/g, 's')
+    .replace(/[8]/g, 'b')
+    .replace(/[\s\._\-\*~`+=,]/g, '');
+  for (const regex of FORBIDDEN_PATTERNS) {
+    if (regex.test(normalized)) return true;
+  }
+  const cyrToLat = normalized
+    .replace(/а/g, 'a')
+    .replace(/в/g, 'b')
+    .replace(/е/g, 'e')
+    .replace(/ё/g, 'e')
+    .replace(/к/g, 'k')
+    .replace(/м/g, 'm')
+    .replace(/н/g, 'h')
+    .replace(/о/g, 'o')
+    .replace(/р/g, 'p')
+    .replace(/с/g, 'c')
+    .replace(/т/g, 't')
+    .replace(/у/g, 'y')
+    .replace(/х/g, 'x');
+  for (const regex of FORBIDDEN_PATTERNS) {
+    if (regex.test(cyrToLat)) return true;
+  }
+  return false;
+}
+
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,21 +136,34 @@ export default async function handler(req, res) {
     }
 
     if (action === 'register') {
-      if (!login || !email || !password_hash || !name) {
+      if (!login || !password_hash || !name) {
         return res.status(400).json({ error: 'Заполните обязательные поля' });
       }
 
+      if (login.trim().length < 5) {
+        return res.status(400).json({ error: 'Логин должен содержать минимум 5 символов' });
+      }
+
+      if (containsForbiddenWord(login) || containsForbiddenWord(email) || containsForbiddenWord(name)) {
+        return res.status(400).json({ error: 'Логин или имя содержит недопустимые слова' });
+      }
+
+      const emailVal = (email && email.includes('@')) ? email.trim() : (login.includes('@') ? login.trim() : `${login.trim()}@umbra.studio`);
+      const cleanLogin = login.trim();
+      const isUmbra = cleanLogin.toLowerCase() === 'umbra' || emailVal.toLowerCase().startsWith('umbra@');
+      const userRole = isUmbra ? 'admin' : 'user';
+
       // Check existing
       const existing = await query(
-        `SELECT id, login, email FROM studio_users WHERE login = '${login.replace(/'/g, "''")}' OR email = '${email.replace(/'/g, "''")}';`
+        `SELECT id, login, email FROM studio_users WHERE login = '${cleanLogin.replace(/'/g, "''")}' OR email = '${emailVal.replace(/'/g, "''")}';`
       );
       if (existing.length > 0) {
         return res.status(400).json({ error: 'Пользователь с таким логином или email уже существует' });
       }
 
       const rows = await query(
-        `INSERT INTO studio_users (login, email, password_hash, name, company, phone) 
-         VALUES ('${login.replace(/'/g, "''")}', '${email.replace(/'/g, "''")}', '${password_hash.replace(/'/g, "''")}', '${name.replace(/'/g, "''")}', '${(company || '').replace(/'/g, "''")}', '${(phone || '').replace(/'/g, "''")}')
+        `INSERT INTO studio_users (login, email, password_hash, name, company, phone, role) 
+         VALUES ('${cleanLogin.replace(/'/g, "''")}', '${emailVal.replace(/'/g, "''")}', '${password_hash.replace(/'/g, "''")}', '${name.trim().replace(/'/g, "''")}', '${(company || '').trim().replace(/'/g, "''")}', '${(phone || '').trim().replace(/'/g, "''")}', '${userRole}')
          RETURNING id, login, email, name, company, phone, role, created_at;`
       );
 
@@ -86,6 +186,10 @@ export default async function handler(req, res) {
       const user = rows[0];
       if (user.password_hash !== password_hash) {
         return res.status(401).json({ error: 'Неверный пароль' });
+      }
+
+      if ((user.login && user.login.toLowerCase() === 'umbra') || (user.email && user.email.toLowerCase().startsWith('umbra@'))) {
+        user.role = 'admin';
       }
 
       delete user.password_hash;
@@ -114,6 +218,13 @@ export default async function handler(req, res) {
     }
 
     if (action === 'update_profile') {
+      if (name && containsForbiddenWord(name)) {
+        return res.status(400).json({ error: 'Имя содержит недопустимые слова' });
+      }
+      if (company && containsForbiddenWord(company)) {
+        return res.status(400).json({ error: 'Название компании содержит недопустимые слова' });
+      }
+
       const qVal = (login || '').trim().replace(/'/g, "''");
       const rows = await query(
         `UPDATE studio_users 

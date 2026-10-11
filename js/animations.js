@@ -126,16 +126,16 @@ function initScrollReveal() {
           revealObserver.unobserve(target);
           setTimeout(() => {
             target.style.transitionDelay = '';
-          }, 1400);
+          }, 500);
         }
       });
     },
-    { threshold: 0.1 }
+    { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }
   );
 
-  // Mark all animatable cards and sections with .rv
+  // Mark only main cards and sections with .rv (avoid lagging inner inputs/labels)
   $$(
-    '.card, .stats div, details, .steps li, .mq, section h2, section .lead, #orderForm label, footer .wrap, .hero .wrap > *'
+    '.card, .plan, .work, .stats div, details, .steps li'
   ).forEach(el => el.classList.add('rv'));
 
   observeReveal();
@@ -144,7 +144,7 @@ function initScrollReveal() {
 function observeReveal() {
   if (!revealObserver) return;
   $$('.rv:not(.in)').forEach((el, index) => {
-    el.style.transitionDelay = `${(index % 4) * 90}ms`;
+    el.style.transitionDelay = `${(index % 3) * 35}ms`;
     revealObserver.observe(el);
   });
 }

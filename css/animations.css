@@ -189,19 +189,62 @@
 
 .rv {
   opacity: 0;
-  transform: translateY(34px) scale(0.97);
-  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform: translateY(16px);
+  transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1), transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
 }
 
 .rv.in {
   opacity: 1;
-  transform: none;
+  transform: translateY(0);
+}
+
+/* Global button micro-interactions */
+.btn {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s, background 0.22s, border-color 0.22s !important;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Form input focus glowing animations */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--ac) !important;
+  box-shadow: 0 0 0 3px rgba(169, 165, 255, 0.22), 0 0 16px rgba(169, 165, 255, 0.12) !important;
+}
+
+/* Tabs transition */
+.tabs button {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.tabs button:hover:not(.on) {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--tx);
 }
 
 /* Interactive Card Spotlight */
 .card {
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, border-color 0.3s;
+}
+
+.card:hover {
+  border-color: rgba(169, 165, 255, 0.28);
 }
 
 .card::before {
@@ -252,7 +295,7 @@
 }
 
 dialog[open] {
-  animation: dialogIn 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: dialogIn 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 dialog[open]::backdrop {

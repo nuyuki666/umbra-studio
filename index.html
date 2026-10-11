@@ -422,10 +422,48 @@
   <dialog id="profileDialog" class="profile-dialog">
     <button class="x" data-close aria-label="Закрыть">×</button>
     <div class="profile-header">
-      <div class="profile-avatar" id="profAvatar">U</div>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profAvatar">U</div>
+        <span class="profile-avatar-status"></span>
+      </div>
       <div class="profile-user-info">
-        <h3 id="profHeadName">Профиль</h3>
-        <p class="profile-meta"><span id="profHeadEmail"></span><span class="badge-role">Клиент</span></p>
+        <div class="profile-title-row">
+          <h3 id="profHeadName">Профиль</h3>
+          <span class="badge-role" id="profRoleBadge">Клиент</span>
+        </div>
+        <p class="profile-meta">
+          <span id="profHeadEmail"></span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Быстрая кнопка перехода в админку для Umbra -->
+    <div id="profAdminRow" style="margin-bottom:14px;" hidden>
+      <button class="btn admin-quick-btn" id="profAdminBtn" type="button" style="width:100%">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <span>Открыть панель управления (Admin Panel)</span>
+      </button>
+    </div>
+
+    <!-- Кибер-виджеты статистики -->
+    <div class="profile-stats-grid">
+      <div class="pstat-card">
+        <span class="pstat-val" id="profOrderCount">0</span>
+        <span class="pstat-lbl">Заказов</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-val"><span class="beacon"></span>Live</span>
+        <span class="pstat-lbl">Статус</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-val" style="color:var(--ok)">Active</span>
+        <span class="pstat-lbl">Защита Turnstile</span>
+      </div>
+      <div class="pstat-card">
+        <span class="pstat-val" id="profRegDate">12.10.2026</span>
+        <span class="pstat-lbl">Аккаунт</span>
       </div>
     </div>
 
@@ -444,7 +482,7 @@
         </label>
         <label>
           Логин / Email (аккаунт)
-          <input id="profLogin" type="text" autocomplete="username" readonly tabindex="-1" style="opacity:0.72;cursor:default">
+          <input id="profLogin" type="text" autocomplete="username" readonly tabindex="-1" style="opacity:0.75;cursor:default">
         </label>
         <label>
           Телефон или Telegram для связи
@@ -495,7 +533,7 @@
     <div class="profile-actions">
       <button class="btn ghost profile-orders-btn" id="profOrdersBtn" type="button">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span>Мои заказы (<b id="profOrderCount">0</b>)</span>
+        <span>Мои заказы</span>
       </button>
       <button class="btn ghost profile-logout-btn" id="profLogoutBtn" type="button" title="Выйти из этого аккаунта">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>

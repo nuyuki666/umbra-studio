@@ -15,6 +15,108 @@ let authFails = 0;
 let authLockUntil = 0;
 
 /**
+ * Forbidden words & profanity filter
+ * Prevents offensive usernames, slurs, and names like gitler, hitler, etc.
+ */
+const FORBIDDEN_PATTERNS = [
+  /gitler/i,
+  /hitler/i,
+  /гитлер/i,
+  /nazi/i,
+  /нацист/i,
+  /фашист/i,
+  /fascist/i,
+  /fuhrer/i,
+  /f[uü]hrer/i,
+  /фюрер/i,
+  /ху[йеяиёю]/i,
+  /xui/i,
+  /huy/i,
+  /xyi/i,
+  /пизд/i,
+  /pizd/i,
+  /пезд/i,
+  /еба[тьнл]/i,
+  /еб[аёе]/i,
+  /ёб[ануты]/i,
+  /ebat/i,
+  /ebal/i,
+  /eblan/i,
+  /бля[тд]/i,
+  /blya/i,
+  /blyad/i,
+  /мудак/i,
+  /мудил/i,
+  /mudak/i,
+  /сука/i,
+  /сучк/i,
+  /suka/i,
+  /гандон/i,
+  /gandon/i,
+  /залуп/i,
+  /zalup/i,
+  /чмо/i,
+  /fuck/i,
+  /bitch/i,
+  /cunt/i,
+  /dick/i,
+  /cock/i,
+  /pussy/i,
+  /nigger/i,
+  /nigga/i,
+  /whore/i,
+  /slut/i
+];
+
+function containsForbiddenWord(str) {
+  if (!str) return false;
+  const raw = String(str).toLowerCase();
+  for (const regex of FORBIDDEN_PATTERNS) {
+    if (regex.test(raw)) return true;
+  }
+  const normalized = raw
+    .replace(/[@4]/g, 'a')
+    .replace(/[0]/g, 'o')
+    .replace(/[1!|]/g, 'i')
+    .replace(/[3]/g, 'e')
+    .replace(/[$5]/g, 's')
+    .replace(/[8]/g, 'b')
+    .replace(/[\s\._\-\*~`+=,]/g, '');
+  for (const regex of FORBIDDEN_PATTERNS) {
+    if (regex.test(normalized)) return true;
+  }
+  const cyrToLat = normalized
+    .replace(/а/g, 'a')
+    .replace(/в/g, 'b')
+    .replace(/е/g, 'e')
+    .replace(/ё/g, 'e')
+    .replace(/к/g, 'k')
+    .replace(/м/g, 'm')
+    .replace(/н/g, 'h')
+    .replace(/о/g, 'o')
+    .replace(/р/g, 'p')
+    .replace(/с/g, 'c')
+    .replace(/т/g, 't')
+    .replace(/у/g, 'y')
+    .replace(/х/g, 'x');
+  for (const regex of FORBIDDEN_PATTERNS) {
+    if (regex.test(cyrToLat)) return true;
+  }
+  return false;
+}
+
+/**
+ * Check if the user has administrative privileges (Umbra or role: admin)
+ */
+function isUserAdmin(login, userObj) {
+  if (!login) return false;
+  const l = String(login).toLowerCase().trim();
+  if (l === 'umbra' || l === 'umbra@umbra.studio' || l === 'umbra@site.ru') return true;
+  if (userObj && (userObj.role === 'admin' || userObj.isAdmin)) return true;
+  return false;
+}
+
+/**
  * Cloudflare Turnstile Real Integration
  */
 function getTurnstileToken(containerSelector = '#auth') {
@@ -79,7 +181,7 @@ function setAuthMode(m) {
   $('#nameRow').hidden = !isReg;
   $('#meter').hidden = !isReg;
   const labelText = $('#mailLabelText');
-  if (labelText) labelText.textContent = isReg ? 'Email' : 'Логин или email';
+  if (labelText) labelText.textContent = isReg ? 'Логин или email (от 5 символов)' : 'Логин или email';
 
   $('#aPass').autocomplete = isReg ? 'new-password' : 'current-password';
 
@@ -128,11 +230,50 @@ function openProfile(initialTab = 'info') {
     return;
   }
 
+  // Check administrator privileges (Umbra has admin rights)
+  const isAdminUser = isUserAdmin(currentUser, u);
+
   // Populate user display info
   const initial = (u.name || 'U')[0].toUpperCase();
   $('#profAvatar').textContent = initial;
   $('#profHeadName').textContent = u.name || 'Профиль';
   $('#profHeadEmail').textContent = currentUser;
+
+  // Role badge
+  const roleBadge = $('#profRoleBadge');
+  if (roleBadge) {
+    if (isAdminUser) {
+      roleBadge.textContent = '👑 Администратор';
+      roleBadge.className = 'badge-role role-admin';
+    } else {
+      roleBadge.textContent = '⭐️ Клиент';
+      roleBadge.className = 'badge-role role-user';
+    }
+  }
+
+  // Quick Admin Panel shortcut row for Umbra
+  const adminRow = $('#profAdminRow');
+  if (adminRow) {
+    adminRow.hidden = !isAdminUser;
+  }
+
+  const adminBtn = $('#profAdminBtn');
+  if (adminBtn) {
+    adminBtn.onclick = () => {
+      const profileDialog = $('#profileDialog');
+      if (profileDialog) profileDialog.close();
+      if (typeof openAdminModal === 'function') {
+        isAdmin = true;
+        openAdminModal();
+      }
+    };
+  }
+
+  // Registration date in stats card
+  const regDateEl = $('#profRegDate');
+  if (regDateEl) {
+    regDateEl.textContent = (u && u.createdAt) || '12.10.2026';
+  }
 
   // Form fields
   $('#profName').value = u.name || '';
@@ -300,20 +441,40 @@ function initAuth() {
         return setErr(`Слишком много попыток. Подождите ${Math.ceil((authLockUntil - Date.now()) / 1000)} с.`);
       }
 
-      if (authMode === 'reg' && name.length < 2) {
-        return setErr('Введите имя — минимум 2 символа.');
-      }
-
-      if (authMode === 'reg' && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) {
-        return setErr('Проверьте email: адрес должен выглядеть как name@site.ru.');
-      }
-
       if (!mail) {
         return setErr('Введите логин или email.');
       }
 
-      if (authMode === 'reg' && !(pass.length >= 8 && /[a-zа-я]/i.test(pass) && /\d/.test(pass))) {
-        return setErr('Пароль: минимум 8 символов, буквы и цифры.');
+      if (authMode === 'reg') {
+        if (name.length < 2) {
+          return setErr('Введите имя — минимум 2 символа.');
+        }
+
+        if (mail.length < 5) {
+          return setErr('Логин должен содержать минимум 5 символов.');
+        }
+
+        if (containsForbiddenWord(mail) || containsForbiddenWord(name)) {
+          return setErr('Логин или имя содержит недопустимые слова.');
+        }
+
+        if (mail.includes('@')) {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) {
+            return setErr('Проверьте email: адрес должен выглядеть как name@site.ru.');
+          }
+          const userPart = mail.split('@')[0];
+          if (userPart.length < 5) {
+            return setErr('Логин в email перед знаком @ должен содержать минимум 5 символов.');
+          }
+        } else {
+          if (!/^[a-zA-Z0-9_\-\.]{5,}$/.test(mail)) {
+            return setErr('Логин должен состоять минимум из 5 символов (латиница, цифры, _, -, .)');
+          }
+        }
+
+        if (!(pass.length >= 8 && /[a-zа-я]/i.test(pass) && /\d/.test(pass))) {
+          return setErr('Пароль: минимум 8 символов, буквы и цифры.');
+        }
       }
 
       if (!pass) {
@@ -331,7 +492,7 @@ function initAuth() {
 
       if (authMode === 'reg') {
         if (users[mail]) {
-          return setErr('Этот email уже зарегистрирован. Перейдите на вкладку «Вход».');
+          return setErr('Этот логин или email уже зарегистрирован. Перейдите на вкладку «Вход».');
         }
 
         try {
@@ -341,7 +502,7 @@ function initAuth() {
             body: JSON.stringify({
               action: 'register',
               login: mail,
-              email: mail,
+              email: mail.includes('@') ? mail : `${mail}@umbra.studio`,
               password_hash: h,
               name,
               turnstile_token: turnstileToken
@@ -356,11 +517,13 @@ function initAuth() {
           console.warn('Backend sync deferred, saving locally:', netErr);
         }
 
+        const isAdminRole = isUserAdmin(mail);
         users[mail] = {
           name,
           h,
           phone: '',
           company: '',
+          role: isAdminRole ? 'admin' : 'user',
           createdAt: new Date().toLocaleDateString('ru-RU')
         };
         db.set('u_users', users);
@@ -380,12 +543,14 @@ function initAuth() {
           const data = await resp.json();
           if (resp.ok && data.ok) {
             loggedIn = true;
+            const isAdminRole = isUserAdmin(mail, data.user);
             users[mail] = {
               name: data.user.name || (users[mail] && users[mail].name) || 'Пользователь',
               h,
               phone: data.user.phone || '',
               company: data.user.company || '',
-              role: data.user.role || 'user'
+              role: isAdminRole ? 'admin' : (data.user.role || 'user'),
+              createdAt: data.user.created_at ? new Date(data.user.created_at).toLocaleDateString('ru-RU') : (users[mail] && users[mail].createdAt) || new Date().toLocaleDateString('ru-RU')
             };
             db.set('u_users', users);
           } else if (resp.status === 401 || resp.status === 403) {
@@ -404,6 +569,10 @@ function initAuth() {
             }
             resetTurnstile();
             return setErr('Неверный логин или пароль.');
+          }
+          if (isUserAdmin(mail, users[mail])) {
+            users[mail].role = 'admin';
+            db.set('u_users', users);
           }
         }
       }
@@ -452,6 +621,10 @@ function initAuth() {
 
       if (newName.length < 2) {
         return setErr('Имя должно содержать минимум 2 символа.');
+      }
+
+      if (containsForbiddenWord(newName) || containsForbiddenWord(newCompany)) {
+        return setErr('Имя или компания содержит недопустимые слова.');
       }
 
       const users = getUsers();

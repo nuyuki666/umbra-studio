@@ -197,16 +197,15 @@ function renderAdmin() {
   if (admBody) admBody.innerHTML = html;
 }
 
-/**
- * Open Admin Modal
- */
 function openAdminModal() {
+  isAdmin = true;
   const adm = $('#adm');
   if (adm) {
     adm.showModal();
     renderAdmin();
   }
 }
+window.openAdminModal = openAdminModal;
 
 /**
  * Initialize Admin Panel
@@ -216,7 +215,17 @@ function initAdmin() {
   const alForm = $('#alF');
 
   const triggerAdminLogin = () => {
-    if (isAdmin) return openAdminModal();
+    const users = typeof getUsers === 'function' ? getUsers() : {};
+    const u = currentUser && users[currentUser];
+    const isUmbraAdmin = isAdmin || 
+      (currentUser && (currentUser.toLowerCase() === 'umbra' || currentUser.toLowerCase().startsWith('umbra@'))) ||
+      (u && u.role === 'admin');
+
+    if (isUmbraAdmin) {
+      isAdmin = true;
+      return openAdminModal();
+    }
+
     $('#alT').textContent = cfg.adm ? 'Вход для администратора' : 'Создайте пароль администратора';
     $('#alP').value = '';
     $('#alE').textContent = '';

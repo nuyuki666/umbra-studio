@@ -1598,30 +1598,58 @@ dialog::backdrop {
    -------------------------------------------------------------------------- */
 
 .profile-dialog {
-  width: min(480px, 100% - 24px);
-  padding: 26px;
+  width: min(520px, 100% - 24px);
+  padding: 28px;
+  background: linear-gradient(180deg, rgba(22, 24, 40, 0.95), rgba(12, 13, 24, 0.98));
+  border: 1px solid rgba(169, 165, 255, 0.25);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(169, 165, 255, 0.15);
+  backdrop-filter: blur(24px);
+  border-radius: 24px;
 }
 
 .profile-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line);
+  gap: 18px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .profile-avatar {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--ac2), var(--ac));
-  color: #0d0c1a;
-  font: 800 22px/1 Onest, sans-serif;
+  color: #0b0c16;
+  font: 800 26px/1 Onest, sans-serif;
   display: grid;
   place-items: center;
-  box-shadow: 0 4px 18px rgba(169, 165, 255, 0.35);
-  flex-shrink: 0;
+  box-shadow: 0 0 24px rgba(169, 165, 255, 0.45), inset 0 0 10px rgba(255, 255, 255, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-avatar:hover {
+  transform: scale(1.08) rotate(4deg);
+}
+
+.profile-avatar-status {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--ok);
+  border: 2.5px solid #121320;
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--ok);
+  animation: beaconPulse 2s infinite ease-in-out;
 }
 
 .profile-user-info {
@@ -1629,35 +1657,111 @@ dialog::backdrop {
   min-width: 0;
 }
 
-.profile-user-info h3 {
-  margin: 0 0 4px;
-  font: 700 1.25rem Onest, sans-serif;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--tx);
-}
-
-.profile-meta {
-  margin: 0;
-  font-size: 13px;
-  color: var(--mu);
+.profile-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  margin-bottom: 4px;
   flex-wrap: wrap;
 }
 
+.profile-title-row h3 {
+  margin: 0;
+  font: 700 1.35rem Onest, sans-serif;
+  color: var(--tx);
+  letter-spacing: -0.01em;
+}
+
 .badge-role {
-  background: rgba(169, 165, 255, 0.14);
+  background: rgba(169, 165, 255, 0.12);
   color: var(--ac);
-  border: 1px solid rgba(169, 165, 255, 0.3);
+  border: 1px solid rgba(169, 165, 255, 0.28);
   border-radius: 6px;
-  padding: 1px 7px;
+  padding: 3px 8px;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-role.role-admin {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(200, 100, 255, 0.25));
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.3);
+  animation: adminGlow 2.5s infinite alternate ease-in-out;
+}
+
+@keyframes adminGlow {
+  to {
+    box-shadow: 0 0 22px rgba(255, 215, 0, 0.6);
+    border-color: rgba(255, 215, 0, 0.8);
+  }
+}
+
+.admin-quick-btn {
+  background: linear-gradient(135deg, #ffd700, #b266ff) !important;
+  color: #0d0c1a !important;
+  font-weight: 700 !important;
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(178, 102, 255, 0.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 11px 16px !important;
+  border-radius: 12px !important;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.admin-quick-btn:hover {
+  transform: translateY(-2px) scale(1.01) !important;
+  box-shadow: 0 8px 28px rgba(178, 102, 255, 0.6) !important;
+}
+
+.admin-quick-btn:active {
+  transform: translateY(1px) !important;
+}
+
+.profile-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.pstat-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.pstat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(169, 165, 255, 0.3);
+  background: rgba(169, 165, 255, 0.06);
+}
+
+.pstat-val {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 15px/1.2 Onest, sans-serif;
+  color: var(--tx);
+  margin-bottom: 3px;
+}
+
+.pstat-lbl {
+  font-size: 11px;
+  color: var(--mu);
+  white-space: nowrap;
 }
 
 .profile-tabs {
@@ -1668,6 +1772,15 @@ dialog::backdrop {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.profile-tab-content input {
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profile-tab-content input:focus {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px rgba(169, 165, 255, 0.2);
 }
 
 .ok-msg {
@@ -1682,8 +1795,8 @@ dialog::backdrop {
   display: flex;
   gap: 10px;
   margin-top: 22px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .profile-actions .btn {
@@ -1693,13 +1806,23 @@ dialog::backdrop {
   justify-content: center;
   gap: 8px;
   font-size: 13px;
-  padding: 10px 14px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.profile-actions .btn:hover {
+  transform: translateY(-2px);
+}
+
+.profile-actions .btn:active {
+  transform: translateY(1px);
 }
 
 .profile-logout-btn:hover {
   color: #ff6b81;
   border-color: rgba(255, 107, 129, 0.4);
-  background: rgba(255, 107, 129, 0.12);
+  background: rgba(255, 107, 129, 0.14);
 }
 
 .chip-caret {
