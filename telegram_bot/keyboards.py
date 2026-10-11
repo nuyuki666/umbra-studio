@@ -15,7 +15,7 @@ def main_menu_reply_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
     """Persistent bottom navigation keyboard with premium emojis"""
     kb = [
         [
-            KeyboardButton(text="🔍 Проверить юзернейм (ввести свой)"),
+            KeyboardButton(text="🔍 Поиск юзернейма"),
         ],
         [
             KeyboardButton(text="⚡ Свободный юз (5 симв.)"),
@@ -26,7 +26,7 @@ def main_menu_reply_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
             KeyboardButton(text="💎 Купить Премиум")
         ],
         [
-            KeyboardButton(text="📜 Меню и тарифы")
+            KeyboardButton(text="ℹ️ О сервисе")
         ]
     ]
     if is_admin:
@@ -69,11 +69,11 @@ def info_modal_back_keyboard() -> InlineKeyboardMarkup:
     """Back button with quick action triggers"""
     kb = [
         [
-            InlineKeyboardButton(text="✅ Начать поиск", callback_data="search_len_5", style="success"),
+            InlineKeyboardButton(text="🔍 Поиск юзернейма", callback_data="prompt_check_custom", style="success"),
             InlineKeyboardButton(text="💎 Премиум доступ", callback_data="open_premium", style="primary")
         ],
         [
-            InlineKeyboardButton(text="🔙 Назад в меню сервиса", callback_data="open_service_info")
+            InlineKeyboardButton(text="🔙 Назад в меню «О сервисе»", callback_data="open_service_info")
         ]
     ]
     return InlineKeyboardMarkup(inline_keyboard=kb)
@@ -106,7 +106,7 @@ def username_check_result_inline_keyboard(username: str, is_free: bool, status_t
         ])
 
     kb.append([
-        InlineKeyboardButton(text="🔍 Проверить другой юзернейм", callback_data="prompt_check_custom"),
+        InlineKeyboardButton(text="🔍 Поиск другого юзернейма", callback_data="prompt_check_custom"),
         InlineKeyboardButton(text="👤 Мой профиль", callback_data="open_profile")
     ])
     return InlineKeyboardMarkup(inline_keyboard=kb)
@@ -125,7 +125,7 @@ def free_found_inline_keyboard(username: str, length: int) -> InlineKeyboardMark
             InlineKeyboardButton(text=f"✨ Найти ({next_len} симв.)", callback_data=f"search_len_{next_len}")
         ],
         [
-            InlineKeyboardButton(text="🔍 Проверить свой", callback_data="prompt_check_custom"),
+            InlineKeyboardButton(text="🔍 Поиск своего", callback_data="prompt_check_custom"),
             InlineKeyboardButton(text="👤 В профиль", callback_data="open_profile")
         ]
     ]
@@ -147,7 +147,7 @@ def profile_inline_keyboard(is_premium: bool = False) -> InlineKeyboardMarkup:
         ])
 
     kb.append([
-        InlineKeyboardButton(text="🔍 Проверить юзернейм", callback_data="prompt_check_custom"),
+        InlineKeyboardButton(text="🔍 Поиск юзернейма", callback_data="prompt_check_custom"),
         InlineKeyboardButton(text="🎟 Ввести промокод", callback_data="enter_promocode")
     ])
     kb.append([
@@ -155,7 +155,7 @@ def profile_inline_keyboard(is_premium: bool = False) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="🔄 Обновить профиль", callback_data="open_profile")
     ])
     kb.append([
-        InlineKeyboardButton(text="ℹ️ Меню сервиса и тарифы", callback_data="open_service_info")
+        InlineKeyboardButton(text="ℹ️ О сервисе", callback_data="open_service_info")
     ])
     return InlineKeyboardMarkup(inline_keyboard=kb)
 
@@ -168,7 +168,7 @@ def premium_offer_inline_keyboard() -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="🎟 Ввести промокод", callback_data="enter_promocode", style="success")
         ],
         [
-            InlineKeyboardButton(text="🔍 Проверить юзернейм", callback_data="prompt_check_custom"),
+            InlineKeyboardButton(text="🔍 Поиск юзернейма", callback_data="prompt_check_custom"),
             InlineKeyboardButton(text="👤 В профиль", callback_data="open_profile")
         ],
         [

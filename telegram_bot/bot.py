@@ -9,6 +9,7 @@ Features:
 - Promo codes & Premium subscription
 - Complete Admin Dashboard (stats, pagination, inspect, ban/unban, give/revoke premium, broadcast, backup)
 - Cloud synchronization with Neon PostgreSQL
+- Safe UI editing (photo vs text) & resilient intent recognition
 """
 import asyncio
 import logging
@@ -75,6 +76,33 @@ def check_banned_user(user_id: int) -> bool:
     return db.is_user_banned(user_id)
 
 
+async def safe_edit_or_answer(
+    event: Message | CallbackQuery, 
+    text: str, 
+    reply_markup: Optional[InlineKeyboardMarkup] = None, 
+    parse_mode: str = "HTML"
+):
+    """
+    Safely edits a text message or sends a new one if target is a photo message.
+    Prevents Telegram 'no text to edit' exceptions.
+    """
+    if isinstance(event, CallbackQuery):
+        try:
+            await event.answer()
+        except Exception:
+            pass
+        target = event.message
+        try:
+            if target.photo:
+                await target.answer(text, reply_markup=reply_markup, parse_mode=parse_mode)
+            else:
+                await target.edit_text(text, reply_markup=reply_markup, parse_mode=parse_mode)
+        except Exception:
+            await target.answer(text, reply_markup=reply_markup, parse_mode=parse_mode)
+    else:
+        await event.answer(text, reply_markup=reply_markup, parse_mode=parse_mode)
+
+
 # --------------------------------------------------------------------------
 # 1. /start & Welcome Handlers
 # --------------------------------------------------------------------------
@@ -104,7 +132,7 @@ async def handle_start(message: Message, state: FSMContext):
         "⚡ <b>Telegram Username Radar</b> — профессиональная платформа для поиска "
         "свободных юзернеймов и аудита доступности через реестры Telegram и аукцион Fragment.\n\n"
         "✨ <b>Возможности системы:</b>\n"
-        "• 🔍 <b>Чекер любого тега</b> — отправьте юзернейм в чат (например: <code>@crypto</code> или <code>vortex</code>)\n"
+        "• 🔍 <b>Поиск любого юзернейма</b> — отправьте тег в чат (например: <code>@crypto</code> или <code>vortex</code>)\n"
         "• ⚡ <b>Подбор 5- и 6-значных тегов</b> — выдача 100% свободных тегов из проверенной базы\n"
         "• 💎 <b>Оценка стоимости</b> — капитализация в TON, $ и ₽, индекс редкости и звучания\n"
         "• 🎨 <b>Ultra HD Карточки</b> — дизайнерский рендер с визуализацией статуса\n\n"
@@ -115,7 +143,7 @@ async def handle_start(message: Message, state: FSMContext):
 
     # First send reply keyboard
     await message.answer(
-        "⚡ Главное меню активировано в нижней панели:",
+        "⚡ Меню управления готово к работе:",
         reply_markup=main_menu_reply_keyboard(is_admin=is_admin)
     )
 
@@ -128,11 +156,15 @@ async def handle_start(message: Message, state: FSMContext):
 
 
 # --------------------------------------------------------------------------
-# 2. Agreement & Info Navigation Modals (User Mockup Buttons)
+# 2. Agreement & Info Navigation Modals (User Mockup Buttons: «О сервисе»)
 # --------------------------------------------------------------------------
 
-@dp.message(F.text == "📜 Меню и тарифы")
-@dp.callback_query(F.data == "open_service_info")
+@dp.message(F.text.in_([
+    "ℹ️ О сервисе", "О сервисе", "📜 Меню и тарифы", "Меню и тарифы",
+    "ℹ️ Меню сервиса и тарифы", "О сервисе ℹ️", "Инфо", "Помощь", "Тарифы",
+    "/help", "/info", "/about"
+]))
+@dp.callback_query(F.data.in_(["open_service_info", "service_info", "about_service"]))
 async def handle_service_info_menu(event: Message | CallbackQuery, state: FSMContext):
     await state.clear()
     text = (
@@ -146,17 +178,12 @@ async def handle_service_info_menu(event: Message | CallbackQuery, state: FSMCon
         "🟢 <i>Зелёная кнопка: запуск мгновенного поиска</i>\n"
         "🟣 <i>Фиолетовая кнопка: активация Безлимита</i>"
     )
-    if isinstance(event, CallbackQuery):
-        await event.answer()
-        await event.message.edit_text(text, parse_mode="HTML", reply_markup=welcome_agreement_inline_keyboard())
-    else:
-        await event.answer(text, parse_mode="HTML", reply_markup=welcome_agreement_inline_keyboard())
+    await safe_edit_or_answer(event, text, reply_markup=welcome_agreement_inline_keyboard())
 
 
 @dp.callback_query(F.data == "start_flow")
 async def handle_start_flow(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.answer("Добро пожаловать! Выберите режим:")
     user_id = callback.from_user.id
     user = db.get_user(user_id)
     q_info = "⭐️ <b>БЕЗЛИМИТ</b>" if user and user["is_premium"] else f"<b>{user['queries_left'] if user else 2} из 2</b>"
@@ -166,7 +193,7 @@ async def handle_start_flow(callback: CallbackQuery, state: FSMContext):
         f"📊 <i>Осталось бесплатных запросов: {q_info}</i>\n\n"
         "1. ⚡ <b>Свободный юз (5 симв.)</b> — редкие короткие теги\n"
         "2. ✨ <b>Свободный юз (6 симв.)</b> — красивые гармоничные имена\n"
-        "3. 🔍 <b>Проверить свой</b> — аудит любого интересующего тега\n\n"
+        "3. 🔍 <b>Поиск своего</b> — аудит любого интересующего тега\n\n"
         "👇 <i>Нажмите кнопку ниже или отправьте юзернейм прямо в чат:</i>"
     )
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -175,19 +202,18 @@ async def handle_start_flow(callback: CallbackQuery, state: FSMContext):
             InlineKeyboardButton(text="✨ Свободный юз (6 симв.)", callback_data="search_len_6", style="primary")
         ],
         [
-            InlineKeyboardButton(text="🔍 Проверить свой юзернейм", callback_data="prompt_check_custom")
+            InlineKeyboardButton(text="🔍 Поиск своего юзернейма", callback_data="prompt_check_custom")
         ],
         [
             InlineKeyboardButton(text="👤 Мой профиль", callback_data="open_profile"),
             InlineKeyboardButton(text="💎 Купить Премиум", callback_data="open_premium")
         ]
     ])
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=kb)
+    await safe_edit_or_answer(callback, text, reply_markup=kb)
 
 
 @dp.callback_query(F.data == "info_agreement")
 async def handle_info_agreement(callback: CallbackQuery):
-    await callback.answer()
     text = (
         "📜 <b>ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</b>\n\n"
         "<b>1. Назначение сервиса:</b>\n"
@@ -202,12 +228,11 @@ async def handle_info_agreement(callback: CallbackQuery):
         "<b>4. Аналитическая оценка:</b>\n"
         "Оценка капитализации в TON и рублях рассчитывается алгоритмически на базе длины, редкости и рыночных продаж Fragment."
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=info_modal_back_keyboard())
 
 
 @dp.callback_query(F.data == "info_privacy")
 async def handle_info_privacy(callback: CallbackQuery):
-    await callback.answer()
     text = (
         "🔒 <b>ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</b>\n\n"
         "<b>• Защита аккаунта:</b>\n"
@@ -220,12 +245,11 @@ async def handle_info_privacy(callback: CallbackQuery):
         "<b>• Безопасность:</b>\n"
         "База данных защищена и синхронизируется в реальном времени с облачным хранилищем."
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=info_modal_back_keyboard())
 
 
 @dp.callback_query(F.data == "info_pricing")
 async def handle_info_pricing(callback: CallbackQuery):
-    await callback.answer()
     text = (
         "💳 <b>ТАРИФЫ И УСЛОВИЯ ПОДПИСКИ</b>\n\n"
         "⚡ <b>Базовый тариф (Free):</b>\n"
@@ -241,12 +265,11 @@ async def handle_info_pricing(callback: CallbackQuery):
         "• 👑 VIP статус в профиле\n"
         "• Стоимость: <b>0 ₽ на этапе тестирования (в 1 клик!)</b>"
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=info_modal_back_keyboard())
 
 
 @dp.callback_query(F.data == "info_support")
 async def handle_info_support(callback: CallbackQuery):
-    await callback.answer()
     text = (
         "🆘 <b>СЛУЖБА ПОДДЕРЖКИ И СВЯЗЬ</b>\n\n"
         "Возник вопрос, предложение или нужна помощь с юзернеймом?\n\n"
@@ -256,12 +279,11 @@ async def handle_info_support(callback: CallbackQuery):
         "• <b>Режим ответа:</b> Оперативно в течение нескольких минут.\n\n"
         "<i>Напишите напрямую администратору при любых вопросах!</i>"
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=info_modal_back_keyboard())
 
 
 @dp.callback_query(F.data == "info_features")
 async def handle_info_features(callback: CallbackQuery):
-    await callback.answer()
     text = (
         "🧩 <b>КАК РАБОТАЕТ НАШ БОТ</b>\n\n"
         "<b>1. Алгоритм тройной верификации:</b>\n"
@@ -276,7 +298,7 @@ async def handle_info_features(callback: CallbackQuery):
         "<b>3. Рендеринг карточек:</b>\n"
         "Для каждого тега формируется дизайнерский постер 1000×560 px для публикации в каналах или сохранения себе."
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=info_modal_back_keyboard())
 
 
 @dp.callback_query(F.data == "noop")
@@ -288,8 +310,7 @@ async def handle_noop(callback: CallbackQuery):
 # 3. User Profile Handlers
 # --------------------------------------------------------------------------
 
-@dp.message(F.text == "👤 Мой профиль")
-@dp.message(Command("profile"))
+@dp.message(F.text.in_(["👤 Мой профиль", "Мой профиль", "Профиль", "/profile"]))
 async def handle_profile(message: Message, state: FSMContext):
     await state.clear()
     user_id = message.from_user.id
@@ -341,12 +362,15 @@ async def send_user_profile(user_id: int, target_message: Message, user: dict):
 
 
 # --------------------------------------------------------------------------
-# 4. Manual Username Checking (User inputs ANY handle)
+# 4. Manual Username Checking (User inputs ANY handle: «Поиск юзернейма»)
 # --------------------------------------------------------------------------
 
-@dp.message(F.text == "🔍 Проверить юзернейм (ввести свой)")
-@dp.message(Command("check"))
-@dp.callback_query(F.data == "prompt_check_custom")
+@dp.message(F.text.in_([
+    "🔍 Поиск юзернейма", "Поиск юзернейма", "🔍 Проверить юзернейм",
+    "Проверить юзернейм", "🔍 Проверить юзернейм (ввести свой)", "🔍 Поиск", "Поиск",
+    "Проверка", "Проверка юзернейма", "/check", "/search"
+]))
+@dp.callback_query(F.data.in_(["prompt_check_custom", "search_custom", "custom_check"]))
 async def handle_prompt_custom_check(event: Message | CallbackQuery, state: FSMContext):
     user_id = event.from_user.id
     if check_banned_user(user_id):
@@ -358,8 +382,8 @@ async def handle_prompt_custom_check(event: Message | CallbackQuery, state: FSMC
 
     await state.set_state(Form.waiting_for_custom_username)
     text = (
-        "🔎 <b>ПРОВЕРКА ЮЗЕРНЕЙМА НА ЗАНЯТОСТЬ</b>\n\n"
-        "Отправьте юзернейм, который вы хотите проверить (например, <code>@alex</code>, <code>vortex</code>, <code>myshop</code>):\n\n"
+        "🔎 <b>ПОИСК И ПРОВЕРКА ЮЗЕРНЕЙМА</b>\n\n"
+        "Отправьте юзернейм, который вы хотите проверить (например: <code>@alex</code>, <code>vortex</code>, <code>crypto</code>):\n\n"
         "<i>Бот выполнит реальный аудит через Telegram и Fragment, определит доступность и рассчитает стоимость.</i>"
     )
 
@@ -384,11 +408,13 @@ async def handle_direct_username_message(message: Message, state: FSMContext):
     raw = message.text.strip().lstrip("@")
     # Ignore commands or button labels
     if raw.startswith("/") or message.text in [
+        "🔍 Поиск юзернейма", "Поиск юзернейма",
         "🔍 Проверить юзернейм (ввести свой)", 
         "⚡ Свободный юз (5 симв.)", 
         "✨ Свободный юз (6 симв.)", 
         "👤 Мой профиль", 
         "💎 Купить Премиум", 
+        "ℹ️ О сервисе", "О сервисе",
         "📜 Меню и тарифы",
         "⚙️ Админ-панель"
     ]:
@@ -573,8 +599,7 @@ async def execute_free_search(event: Message | CallbackQuery, length: int):
 # 6. Premium Subscription & Promocodes
 # --------------------------------------------------------------------------
 
-@dp.message(F.text == "💎 Купить Премиум")
-@dp.message(Command("premium"))
+@dp.message(F.text.in_(["💎 Купить Премиум", "Купить Премиум", "Премиум", "/premium"]))
 @dp.callback_query(F.data == "open_premium")
 async def handle_premium_offer(event: Message | CallbackQuery, state: FSMContext):
     await state.clear()
@@ -596,11 +621,7 @@ async def handle_premium_offer(event: Message | CallbackQuery, state: FSMContext
         "👇 <i>Активируйте тестовый премиум в 1 клик или введите промокод:</i>"
     )
 
-    if isinstance(event, CallbackQuery):
-        await event.answer()
-        await event.message.answer(text, parse_mode="HTML", reply_markup=premium_offer_inline_keyboard())
-    else:
-        await event.answer(text, parse_mode="HTML", reply_markup=premium_offer_inline_keyboard())
+    await safe_edit_or_answer(event, text, reply_markup=premium_offer_inline_keyboard())
 
 
 @dp.callback_query(F.data == "activate_demo_premium")
@@ -693,8 +714,7 @@ async def handle_view_history(callback: CallbackQuery):
 # 8. Admin Panel Handlers
 # --------------------------------------------------------------------------
 
-@dp.message(F.text == "⚙️ Админ-панель")
-@dp.message(Command("admin"))
+@dp.message(F.text.in_(["⚙️ Админ-панель", "Админ-панель", "/admin"]))
 async def handle_admin_entry(message: Message, state: FSMContext):
     await state.clear()
     user_id = message.from_user.id
@@ -738,7 +758,7 @@ async def handle_admin_main_callback(callback: CallbackQuery, state: FSMContext)
         f"• Активных промокодов: <b>{stats['active_promos']}</b>\n\n"
         "<i>Выберите раздел:</i>"
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=admin_main_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=admin_main_keyboard())
 
 
 @dp.callback_query(F.data == "adm_close")
@@ -769,7 +789,7 @@ async def handle_admin_detailed_stats(callback: CallbackQuery):
         f"🎟 <b>Промокоды:</b>\n"
         f"• Неиспользованных кодов: <code>{stats['active_promos']}</code> шт.\n"
     )
-    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=admin_main_keyboard())
+    await safe_edit_or_answer(callback, text, reply_markup=admin_main_keyboard())
 
 
 @dp.callback_query(F.data.startswith("adm_users_page_"))
@@ -784,11 +804,7 @@ async def handle_admin_users_pagination(callback: CallbackQuery):
         f"👥 <b>СПИСОК ПОЛЬЗОВАТЕЛЕЙ</b> (Всего: {total_count})\n\n"
         "<i>Нажмите на пользователя для просмотра профиля, бана или выдачи Премиума:</i>"
     )
-    await callback.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=admin_users_pagination_keyboard(users, page, total_pages)
-    )
+    await safe_edit_or_answer(callback, text, reply_markup=admin_users_pagination_keyboard(users, page, total_pages))
 
 
 @dp.callback_query(F.data.startswith("adm_u_"))
@@ -823,9 +839,9 @@ async def refresh_admin_user_card(callback: CallbackQuery, user: dict):
         f"• <b>Дата регистрации:</b> {user['registered_at']}\n"
     )
 
-    await callback.message.edit_text(
+    await safe_edit_or_answer(
+        callback,
         text,
-        parse_mode="HTML",
         reply_markup=admin_user_management_keyboard(
             target_id=target_id,
             is_banned=bool(user["is_banned"]),
@@ -930,7 +946,7 @@ async def handle_admin_user_history(callback: CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text="🔙 К карточке пользователя", callback_data=f"adm_u_{target_id}")
     ]])
-    await callback.message.edit_text("\n".join(lines), parse_mode="HTML", reply_markup=kb)
+    await safe_edit_or_answer(callback, "\n".join(lines), reply_markup=kb)
 
 
 @dp.callback_query(F.data == "adm_search_user")
@@ -1077,9 +1093,9 @@ async def handle_admin_promos_list(callback: CallbackQuery):
             status = f"❌ Использован (ID: {p['used_by']})" if p["is_used"] else "🟢 АКТИВЕН"
             lines.append(f"• <code>{p['code']}</code> — {status}")
 
-    await callback.message.edit_text(
+    await safe_edit_or_answer(
+        callback,
         "\n".join(lines),
-        parse_mode="HTML",
         reply_markup=admin_promocodes_keyboard()
     )
 
@@ -1133,6 +1149,61 @@ async def handle_admin_dump_db(callback: CallbackQuery):
         )
     else:
         await callback.message.answer("❌ Файл базы данных пока не создан.")
+
+
+# --------------------------------------------------------------------------
+# 9. Fallback & Smart Intent Handlers (Catch-all for resilient UX)
+# --------------------------------------------------------------------------
+
+@dp.message()
+async def fallback_catch_all_message(message: Message, state: FSMContext):
+    """
+    Guarantees no user message is ever left unhandled.
+    Detects user intent automatically.
+    """
+    raw = (message.text or "").strip()
+    raw_lower = raw.lower()
+    user_id = message.from_user.id
+    logger.info(f"Fallback intent detector: '{raw}' from user {user_id}")
+
+    if any(k in raw_lower for k in ["поиск", "провер", "найти", "check", "search", "тег", "юз"]):
+        await handle_prompt_custom_check(message, state)
+    elif any(k in raw_lower for k in ["сервис", "меню", "тариф", "инфо", "помощь", "о нас", "help", "about"]):
+        await handle_service_info_menu(message, state)
+    elif any(k in raw_lower for k in ["профил", "кабинет", "баланс", "аккаунт", "стат"]):
+        await handle_profile(message, state)
+    elif any(k in raw_lower for k in ["премиум", "купить", "безлимит", "vip", "подписк"]):
+        await handle_premium_offer(message, state)
+    elif len(raw) >= 4 and len(raw) <= 32 and " " not in raw and not raw.startswith("/"):
+        await execute_username_audit(message, raw)
+    else:
+        await message.answer(
+            "👋 <b>Главное меню:</b>\n"
+            "Выберите нужное действие ниже или отправьте юзернейм для проверки (например: <code>@crypto</code>):",
+            parse_mode="HTML",
+            reply_markup=main_menu_reply_keyboard(is_admin=user_id in ADMIN_IDS)
+        )
+
+
+@dp.callback_query()
+async def fallback_catch_all_callback(callback: CallbackQuery, state: FSMContext):
+    """
+    Catches any callback query from older messages or custom payloads.
+    """
+    data = (callback.data or "").lower()
+    logger.info(f"Fallback intent callback: '{data}' from user {callback.from_user.id}")
+    await callback.answer()
+
+    if any(k in data for k in ["service", "info", "menu", "tariff", "about", "help"]):
+        await handle_service_info_menu(callback, state)
+    elif any(k in data for k in ["check", "search", "custom", "find"]):
+        await handle_prompt_custom_check(callback, state)
+    elif "profile" in data:
+        await handle_callback_profile(callback, state)
+    elif "prem" in data:
+        await handle_premium_offer(callback, state)
+    else:
+        await handle_service_info_menu(callback, state)
 
 
 # --------------------------------------------------------------------------
