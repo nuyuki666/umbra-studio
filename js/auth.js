@@ -15,35 +15,24 @@ let authFails = 0;
 let authLockUntil = 0;
 
 /**
- * Cloudflare Turnstile Mock State
+ * Cloudflare Turnstile Real Integration
  */
-const turnstileState = { ok: false, busy: false };
-
-function resetTurnstile() {
-  turnstileState.ok = false;
-  turnstileState.busy = false;
-  const cfEl = $('#cf');
-  if (!cfEl) return;
-  cfEl.className = 'cf';
-  cfEl.setAttribute('aria-checked', 'false');
-  $('#cfT').textContent = 'Подтвердите, что вы человек';
+function getTurnstileToken(containerSelector = '#auth') {
+  const container = document.querySelector(containerSelector);
+  const input = container ? container.querySelector('[name="cf-turnstile-response"]') : document.querySelector('[name="cf-turnstile-response"]');
+  if (input && input.value) return input.value;
+  if (window.turnstile && typeof window.turnstile.getResponse === 'function') {
+    return window.turnstile.getResponse() || '';
+  }
+  return '';
 }
 
-function runTurnstile() {
-  if (turnstileState.ok || turnstileState.busy) return;
-  turnstileState.busy = true;
-  const cfEl = $('#cf');
-  if (!cfEl) return;
-  cfEl.className = 'cf busy';
-  $('#cfT').textContent = 'Проверяем…';
-
-  setTimeout(() => {
-    turnstileState.ok = true;
-    turnstileState.busy = false;
-    cfEl.className = 'cf ok';
-    cfEl.setAttribute('aria-checked', 'true');
-    $('#cfT').textContent = 'Проверка пройдена';
-  }, 900);
+function resetTurnstile() {
+  if (window.turnstile && typeof window.turnstile.reset === 'function') {
+    try {
+      window.turnstile.reset();
+    } catch (e) {}
+  }
 }
 
 /**
@@ -288,17 +277,7 @@ function initAuth() {
     });
   }
 
-  // Turnstile handlers
-  const cfEl = $('#cf');
-  if (cfEl) {
-    cfEl.onclick = runTurnstile;
-    cfEl.onkeydown = e => {
-      if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        runTurnstile();
-      }
-    };
-  }
+
 
   // Auth Form submit handler (login & register)
   const form = $('#aForm');
@@ -341,9 +320,10 @@ function initAuth() {
         return setErr('Введите пароль.');
       }
 
-      if (!turnstileState.ok) {
-        $('#cf').classList.add('bad');
-        return setErr('Пройдите проверку Cloudflare.');
+      // Real Cloudflare Turnstile Verification
+      const turnstileToken = getTurnstileToken('#auth');
+      if (typeof window.turnstile !== 'undefined' && !turnstileToken) {
+        return setErr('Пожалуйста, подтвердите проверку Cloudflare Turnstile.');
       }
 
       const users = getUsers();
@@ -363,11 +343,13 @@ function initAuth() {
               login: mail,
               email: mail,
               password_hash: h,
-              name
+              name,
+              turnstile_token: turnstileToken
             })
           });
           const data = await resp.json();
           if (!resp.ok) {
+            resetTurnstile();
             return setErr(data.error || 'Ошибка при регистрации в базе данных.');
           }
         } catch (netErr) {
@@ -391,7 +373,8 @@ function initAuth() {
             body: JSON.stringify({
               action: 'login',
               login: mail,
-              password_hash: h
+              password_hash: h,
+              turnstile_token: turnstileToken
             })
           });
           const data = await resp.json();
@@ -405,7 +388,7 @@ function initAuth() {
               role: data.user.role || 'user'
             };
             db.set('u_users', users);
-          } else if (resp.status === 401) {
+          } else if (resp.status === 401 || resp.status === 403) {
             resetTurnstile();
             return setErr(data.error || 'Неверный логин или пароль.');
           }

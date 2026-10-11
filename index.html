@@ -18,6 +18,9 @@
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Cloudflare Turnstile Script -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <!-- Background Effects -->
@@ -221,6 +224,10 @@
           </label>
           <p class="closed" id="oClosed" hidden></p>
           <p class="err" id="oErr"></p>
+          <!-- Cloudflare Turnstile in Order Form -->
+          <div class="cf-turnstile-wrap" style="margin:10px 0 14px;display:flex;justify-content:center;">
+            <div class="cf-turnstile" id="orderTurnstile" data-sitekey="0x4AAAAAAAE5HJWQLkBk8CiF" data-theme="dark" data-size="flexible"></div>
+          </div>
           <button class="btn big" style="width:100%">Отправить заказ</button>
           <p class="note" id="oHint"></p>
           <p class="legal-disclaimer" style="font-size:12px;color:var(--mu);margin-top:10px;text-align:center">
@@ -352,11 +359,9 @@
       </label>
       <div class="meter" id="meter" hidden><i></i><i></i><i></i><i></i></div>
       
-      <!-- Cloudflare Turnstile Stub -->
-      <div class="cf" id="cf" role="checkbox" aria-checked="false" tabindex="0">
-        <span class="box"></span>
-        <span id="cfT">Подтвердите, что вы человек</span>
-        <em>Cloudflare<br>Turnstile</em>
+      <!-- Real Cloudflare Turnstile Widget -->
+      <div class="cf-turnstile-wrap" style="margin:14px 0 10px;display:flex;justify-content:center;">
+        <div class="cf-turnstile" id="authTurnstile" data-sitekey="0x4AAAAAAAE5HJWQLkBk8CiF" data-theme="dark" data-size="flexible"></div>
       </div>
       <p class="err" id="aErr"></p>
       <button class="btn big" style="width:100%" id="aGo">Войти</button>

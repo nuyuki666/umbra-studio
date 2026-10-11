@@ -1,5 +1,28 @@
 import { query } from './db.js';
 
+const CLOUDFLARE_SECRET_KEY = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY || '0x4AAAAAAAE5JWslqi2DuzHz0Lsut3ZfHes';
+
+async function verifyCloudflareTurnstile(token, ip) {
+  if (!token) return true; // graceful fallback for local testing
+  try {
+    const formData = new URLSearchParams();
+    formData.append('secret', CLOUDFLARE_SECRET_KEY);
+    formData.append('response', token);
+    if (ip) formData.append('remoteip', ip);
+
+    const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData
+    });
+    const outcome = await resp.json();
+    return outcome.success;
+  } catch (err) {
+    console.error('Cloudflare Turnstile verify error:', err);
+    return true; // fail open
+  }
+}
+
 export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,7 +38,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { action, login, email, password_hash, name, company, phone, old_hash, new_hash } = req.body || {};
+    const { action, login, email, password_hash, name, company, phone, old_hash, new_hash, turnstile_token } = req.body || {};
+
+    if (action === 'register' || action === 'login') {
+      const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress;
+      const isHuman = await verifyCloudflareTurnstile(turnstile_token, clientIp);
+      if (!isHuman) {
+        return res.status(403).json({ error: 'Проверка Cloudflare Turnstile не пройдена.' });
+      }
+    }
 
     if (action === 'register') {
       if (!login || !email || !password_hash || !name) {

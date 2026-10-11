@@ -123,6 +123,13 @@ function initOrders() {
         return triggerError('Укажите свою сумму — от 100 ₽.');
       }
 
+      // Check Cloudflare Turnstile token in Order form
+      const orderTurnstileInput = orderForm.querySelector('[name="cf-turnstile-response"]');
+      const orderTurnstileToken = orderTurnstileInput ? orderTurnstileInput.value : '';
+      if (typeof window.turnstile !== 'undefined' && orderTurnstileInput && !orderTurnstileToken) {
+        return triggerError('Пожалуйста, подтвердите проверку Cloudflare Turnstile перед отправкой.');
+      }
+
       const sendOrder = () => {
         const users = getUsers();
         if (users[currentUser]?.banned) {
@@ -158,11 +165,16 @@ function initOrders() {
                 price: parseInt(String(newOrder.bud).replace(/\D/g, '') || 5000, 10),
                 client_name: newOrder.name,
                 contact: newOrder.con,
-                description: newOrder.desc
+                description: newOrder.desc,
+                turnstile_token: orderTurnstileToken
               }
             })
           }).catch(err => console.warn('Order cloud sync deferred:', err));
         } catch (e) {}
+
+        if (window.turnstile && typeof window.turnstile.reset === 'function') {
+          try { window.turnstile.reset(); } catch(e) {}
+        }
 
         ordersList.unshift(newOrder);
         db.set('orders', ordersList);
