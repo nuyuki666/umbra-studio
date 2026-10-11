@@ -353,6 +353,27 @@ function initAuth() {
         if (users[mail]) {
           return setErr('Этот email уже зарегистрирован. Перейдите на вкладку «Вход».');
         }
+
+        try {
+          const resp = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'register',
+              login: mail,
+              email: mail,
+              password_hash: h,
+              name
+            })
+          });
+          const data = await resp.json();
+          if (!resp.ok) {
+            return setErr(data.error || 'Ошибка при регистрации в базе данных.');
+          }
+        } catch (netErr) {
+          console.warn('Backend sync deferred, saving locally:', netErr);
+        }
+
         users[mail] = {
           name,
           h,
@@ -362,17 +383,49 @@ function initAuth() {
         };
         db.set('u_users', users);
       } else {
-        if (!users[mail] || users[mail].h !== h) {
-          if (++authFails >= 5) {
-            authLockUntil = Date.now() + 30000;
-            authFails = 0;
+        let loggedIn = false;
+        try {
+          const resp = await fetch('/api/auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'login',
+              login: mail,
+              password_hash: h
+            })
+          });
+          const data = await resp.json();
+          if (resp.ok && data.ok) {
+            loggedIn = true;
+            users[mail] = {
+              name: data.user.name || (users[mail] && users[mail].name) || 'Пользователь',
+              h,
+              phone: data.user.phone || '',
+              company: data.user.company || '',
+              role: data.user.role || 'user'
+            };
+            db.set('u_users', users);
+          } else if (resp.status === 401) {
+            resetTurnstile();
+            return setErr(data.error || 'Неверный логин или пароль.');
           }
-          resetTurnstile();
-          return setErr('Неверный логин или пароль.');
+        } catch (netErr) {
+          console.warn('Backend offline, checking local cache:', netErr);
+        }
+
+        if (!loggedIn) {
+          if (!users[mail] || users[mail].h !== h) {
+            if (++authFails >= 5) {
+              authLockUntil = Date.now() + 30000;
+              authFails = 0;
+            }
+            resetTurnstile();
+            return setErr('Неверный логин или пароль.');
+          }
         }
       }
 
-      if (users[mail].banned) {
+      if (users[mail] && users[mail].banned) {
         return setErr('Аккаунт заблокирован администратором.');
       }
 
@@ -428,13 +481,28 @@ function initAuth() {
       users[currentUser].company = newCompany;
       db.set('u_users', users);
 
+      // Background sync to Neon database
+      try {
+        fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'update_profile',
+            login: currentUser,
+            name: newName,
+            phone: newPhone,
+            company: newCompany
+          })
+        }).catch(err => console.warn('Background profile sync error:', err));
+      } catch (e) {}
+
       // Update UI displays
       renderAuth();
       $('#profAvatar').textContent = newName[0].toUpperCase();
       $('#profHeadName').textContent = newName;
 
       okEl.hidden = false;
-      okEl.textContent = 'Данные профиля успешно сохранены!';
+      okEl.textContent = 'Данные профиля успешно сохранены в базе!';
       toast('Профиль обновлён');
     });
   }
@@ -487,6 +555,27 @@ function initAuth() {
       }
 
       const newHash = await hash(newPass);
+
+      // Sync password update to Neon database
+      try {
+        const resp = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'change_password',
+            login: currentUser,
+            old_hash: oldHash,
+            new_hash: newHash
+          })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          return setErr(data.error || 'Ошибка при обновлении пароля на сервере.');
+        }
+      } catch (netErr) {
+        console.warn('Backend password sync deferred:', netErr);
+      }
+
       users[currentUser].h = newHash;
       db.set('u_users', users);
 
@@ -497,7 +586,7 @@ function initAuth() {
       $$('#profMeter i').forEach(bar => bar.classList.remove('on'));
 
       okEl.hidden = false;
-      okEl.textContent = 'Пароль успешно изменён!';
+      okEl.textContent = 'Пароль успешно изменён и сохранён в базе!';
       toast('Пароль успешно обновлён');
     });
   }

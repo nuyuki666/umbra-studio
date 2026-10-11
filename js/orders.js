@@ -32,18 +32,32 @@ function openOrderSuccessModal(id) {
  * List orders for the currently signed-in user
  */
 function listOrders() {
-  const orders = getOrders().filter(o => o.user === currentUser);
-  const listEl = $('#ordList');
-  if (!listEl) return;
+  const renderList = (items) => {
+    const listEl = $('#ordList');
+    if (!listEl) return;
+    listEl.innerHTML = items.length
+      ? items
+          .map(
+            o =>
+              `<div class="ord"><span class="st">${o.status || 'Новый'}</span><b>${o.id} · ${esc(o.type || o.service_plan || 'Проект')}</b><br><small>${esc(o.name || o.client_name || 'Клиент')} · ${o.date || (o.created_at ? new Date(o.created_at).toLocaleDateString('ru-RU') : '')}${o.quote ? ` · наша цена: ${fmt(o.quote)}` : ''}</small></div>`
+          )
+          .join('')
+      : '<p class="note" style="text-align:left">Заказов пока нет. Заполните форму выше — он появится здесь.</p>';
+  };
 
-  listEl.innerHTML = orders.length
-    ? orders
-        .map(
-          o =>
-            `<div class="ord"><span class="st">${o.status || 'Новый'}</span><b>${o.id} · ${esc(o.type)}</b><br><small>${esc(o.name)} · ${o.date}${o.quote ? ` · наша цена: ${fmt(o.quote)}` : ''}</small></div>`
-        )
-        .join('')
-    : '<p class="note" style="text-align:left">Заказов пока нет. Заполните форму выше — он появится здесь.</p>';
+  const localOrders = getOrders().filter(o => o.user === currentUser);
+  renderList(localOrders);
+
+  if (currentUser) {
+    fetch('/api/orders?email=' + encodeURIComponent(currentUser))
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok && Array.isArray(data.orders) && data.orders.length > 0) {
+          renderList(data.orders);
+        }
+      })
+      .catch(() => {});
+  }
 }
 
 /**
@@ -129,6 +143,26 @@ function initOrders() {
           con,
           date: new Date().toLocaleDateString('ru-RU')
         };
+
+        // Sync order to Neon PostgreSQL
+        try {
+          fetch('/api/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'create',
+              order: {
+                id: newOrder.id,
+                user_email: currentUser,
+                service_plan: newOrder.type,
+                price: parseInt(String(newOrder.bud).replace(/\D/g, '') || 5000, 10),
+                client_name: newOrder.name,
+                contact: newOrder.con,
+                description: newOrder.desc
+              }
+            })
+          }).catch(err => console.warn('Order cloud sync deferred:', err));
+        } catch (e) {}
 
         ordersList.unshift(newOrder);
         db.set('orders', ordersList);

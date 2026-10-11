@@ -1,15 +1,20 @@
 """
-Telegram Username Radar Bot (aiogram 3.x)
-High-performance async bot for finding and checking Telegram usernames:
-- Live verification via Fragment and Telegram (zero false-positives).
-- Manual username checking (type any handle to see if it is free/taken/Fragment NFT).
-- Verified free 5- and 6-character username retrieval.
-- High-res Pillow cards & TON/USD/RUB market valuations.
-- Comprehensive Admin Dashboard with user inspection, bans, broadcasts, and promo codes.
+Telegram Username Radar Bot (SolisSearch)
+Features:
+- Real-time availability verification via Fragment.com and Telegram
+- High-res dynamic visual cards generated via Pillow
+- Native Telegram colored buttons (green: success, purple: primary)
+- User Agreement, Privacy Policy, Pricing, Support, and Features info modals
+- Profile management with monograms and quotas
+- Promo codes & Premium subscription
+- Complete Admin Dashboard (stats, pagination, inspect, ban/unban, give/revoke premium, broadcast, backup)
+- Cloud synchronization with Neon PostgreSQL
 """
-import os
 import asyncio
 import logging
+import os
+from typing import Optional
+
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
@@ -17,16 +22,21 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import (
     Message, 
     CallbackQuery, 
-    BufferedInputFile,
-    FSInputFile
+    BufferedInputFile, 
+    FSInputFile, 
+    InlineKeyboardMarkup, 
+    InlineKeyboardButton
 )
 
-from config import BOT_TOKEN, ADMIN_IDS, DATABASE_PATH
 import database as db
+from config import BOT_TOKEN, ADMIN_IDS, DATABASE_PATH
 from generator import analyze_username, find_available_username
 from card_builder import create_username_card, create_profile_card
+from cloud_sync import sync_user_to_cloud, sync_search_to_cloud
 from keyboards import (
     main_menu_reply_keyboard,
+    welcome_agreement_inline_keyboard,
+    info_modal_back_keyboard,
     username_check_result_inline_keyboard,
     free_found_inline_keyboard,
     profile_inline_keyboard,
@@ -39,14 +49,19 @@ from keyboards import (
     admin_promocodes_keyboard
 )
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+logger = logging.getLogger("solis_bot")
 
+
+# --------------------------------------------------------------------------
 # FSM States
+# --------------------------------------------------------------------------
 class Form(StatesGroup):
-    waiting_for_promocode = State()
     waiting_for_custom_username = State()
+    waiting_for_promocode = State()
     admin_waiting_search_user = State()
     admin_waiting_broadcast_message = State()
     admin_waiting_new_promocode = State()
@@ -78,29 +93,199 @@ async def handle_start(message: Message, state: FSMContext):
     user = db.get_or_create_user(user_id, username, full_name)
     is_admin = user_id in ADMIN_IDS
 
+    # Async background sync to Neon PostgreSQL
+    asyncio.create_task(sync_user_to_cloud(
+        user_id, username, full_name, 
+        bool(user["is_premium"]), user["queries_left"], user["total_searches"]
+    ))
+
     welcome_text = (
-        f"👋 <b>Добро пожаловать, {full_name}!</b>\n\n"
-        "⚡ <b>Telegram Username Radar</b> — сервис для проверки занятости "
-        "и поиска свободных юзернеймов с оценкой их рыночной стоимости.\n\n"
-        "✨ <b>Как пользоваться:</b>\n"
-        "• 🔍 <b>Проверить юзернейм</b> — отправьте любой тег (например, <code>@crypto</code> или <code>myname</code>), "
-        "и бот проверит, свободен ли он в Telegram или на Fragment.\n"
-        "• ⚡ <b>Свободный юз (5 / 6 симв.)</b> — мгновенный подбор гарантированно свободного тега из базы.\n"
-        "• 🎨 Для каждого юзернейма создаётся стильная дизайнерская карточка с оценкой в TON и $.\n\n"
+        f"👋 <b>Добро пожаловать в сервис, {full_name}!</b>\n\n"
+        "⚡ <b>Telegram Username Radar</b> — профессиональная платформа для поиска "
+        "свободных юзернеймов и аудита доступности через реестры Telegram и аукцион Fragment.\n\n"
+        "✨ <b>Возможности системы:</b>\n"
+        "• 🔍 <b>Чекер любого тега</b> — отправьте юзернейм в чат (например: <code>@crypto</code> или <code>vortex</code>)\n"
+        "• ⚡ <b>Подбор 5- и 6-значных тегов</b> — выдача 100% свободных тегов из проверенной базы\n"
+        "• 💎 <b>Оценка стоимости</b> — капитализация в TON, $ и ₽, индекс редкости и звучания\n"
+        "• 🎨 <b>Ultra HD Карточки</b> — дизайнерский рендер с визуализацией статуса\n\n"
         f"🎁 <b>Ваш тариф:</b> {'⭐️ <b>PREMIUM (Безлимит)</b>' if user['is_premium'] else f'⚡ <b>Базовый (2 бесплатных запроса)</b>'}\n"
-        f"{'👑 <i>Вы авторизованы как администратор бота.</i>\n' if is_admin else ''}\n"
-        "👇 <i>Отправьте юзернейм сообщением или выберите действие:</i>"
+        f"{'👑 <i>Авторизован как администратор платформы.</i>\n' if is_admin else ''}\n"
+        "👇 <i>Ознакомьтесь с условиями сервиса и запустите поиск:</i>"
     )
 
+    # First send reply keyboard
+    await message.answer(
+        "⚡ Главное меню активировано в нижней панели:",
+        reply_markup=main_menu_reply_keyboard(is_admin=is_admin)
+    )
+
+    # Then send the main agreement & actions card
     await message.answer(
         welcome_text,
         parse_mode="HTML",
-        reply_markup=main_menu_reply_keyboard(is_admin=is_admin)
+        reply_markup=welcome_agreement_inline_keyboard()
     )
 
 
 # --------------------------------------------------------------------------
-# 2. User Profile Handlers
+# 2. Agreement & Info Navigation Modals (User Mockup Buttons)
+# --------------------------------------------------------------------------
+
+@dp.message(F.text == "📜 Меню и тарифы")
+@dp.callback_query(F.data == "open_service_info")
+async def handle_service_info_menu(event: Message | CallbackQuery, state: FSMContext):
+    await state.clear()
+    text = (
+        "🧭 <b>НАВИГАЦИЯ И УСЛОВИЯ СЕРВИСА</b>\n\n"
+        "Выберите интересующий раздел или запустите подбор юзернейма:\n\n"
+        "• 📜 <b>Соглашение</b> — правила использования сервиса\n"
+        "• 🔒 <b>Конфиденциальность</b> — защита и сохранность ваших данных\n"
+        "• 💳 <b>Тарифы и цены</b> — сравнение Free и Premium подписок\n"
+        "• 🆘 <b>Поддержка</b> — прямая связь с администратором\n"
+        "• 🧩 <b>Что умеет бот</b> — подробное описание алгоритмов аудита\n\n"
+        "🟢 <i>Зелёная кнопка: запуск мгновенного поиска</i>\n"
+        "🟣 <i>Фиолетовая кнопка: активация Безлимита</i>"
+    )
+    if isinstance(event, CallbackQuery):
+        await event.answer()
+        await event.message.edit_text(text, parse_mode="HTML", reply_markup=welcome_agreement_inline_keyboard())
+    else:
+        await event.answer(text, parse_mode="HTML", reply_markup=welcome_agreement_inline_keyboard())
+
+
+@dp.callback_query(F.data == "start_flow")
+async def handle_start_flow(callback: CallbackQuery, state: FSMContext):
+    await state.clear()
+    await callback.answer("Добро пожаловать! Выберите режим:")
+    user_id = callback.from_user.id
+    user = db.get_user(user_id)
+    q_info = "⭐️ <b>БЕЗЛИМИТ</b>" if user and user["is_premium"] else f"<b>{user['queries_left'] if user else 2} из 2</b>"
+
+    text = (
+        "🚀 <b>ВЫБЕРИТЕ РЕЖИМ РАБОТЫ СЕРВИСА:</b>\n\n"
+        f"📊 <i>Осталось бесплатных запросов: {q_info}</i>\n\n"
+        "1. ⚡ <b>Свободный юз (5 симв.)</b> — редкие короткие теги\n"
+        "2. ✨ <b>Свободный юз (6 симв.)</b> — красивые гармоничные имена\n"
+        "3. 🔍 <b>Проверить свой</b> — аудит любого интересующего тега\n\n"
+        "👇 <i>Нажмите кнопку ниже или отправьте юзернейм прямо в чат:</i>"
+    )
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="⚡ Свободный юз (5 симв.)", callback_data="search_len_5", style="success"),
+            InlineKeyboardButton(text="✨ Свободный юз (6 симв.)", callback_data="search_len_6", style="primary")
+        ],
+        [
+            InlineKeyboardButton(text="🔍 Проверить свой юзернейм", callback_data="prompt_check_custom")
+        ],
+        [
+            InlineKeyboardButton(text="👤 Мой профиль", callback_data="open_profile"),
+            InlineKeyboardButton(text="💎 Купить Премиум", callback_data="open_premium")
+        ]
+    ])
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=kb)
+
+
+@dp.callback_query(F.data == "info_agreement")
+async def handle_info_agreement(callback: CallbackQuery):
+    await callback.answer()
+    text = (
+        "📜 <b>ПОЛЬЗОВАТЕЛЬСКОЕ СОГЛАШЕНИЕ</b>\n\n"
+        "<b>1. Назначение сервиса:</b>\n"
+        "Сервис предназначен для аналитической проверки доступности публичных юзернеймов Telegram "
+        "и мониторинга лотов на официальном аукционе Fragment (TON NFT).\n\n"
+        "<b>2. Гарантии и бронирование:</b>\n"
+        "Если юзернейм определен как свободный, сервис предоставляет прямую ссылку для его регистрации. "
+        "Бронируйте свободные теги сразу в настройках Telegram, так как их может занять другой пользователь.\n\n"
+        "<b>3. Лимиты и подписка:</b>\n"
+        "На бесплатном тарифе предоставляется 2 базовые проверки. "
+        "Для неограниченного пользования предусмотрен тариф Premium (доступен по промокоду или в 1 клик).\n\n"
+        "<b>4. Аналитическая оценка:</b>\n"
+        "Оценка капитализации в TON и рублях рассчитывается алгоритмически на базе длины, редкости и рыночных продаж Fragment."
+    )
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+
+
+@dp.callback_query(F.data == "info_privacy")
+async def handle_info_privacy(callback: CallbackQuery):
+    await callback.answer()
+    text = (
+        "🔒 <b>ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</b>\n\n"
+        "<b>• Защита аккаунта:</b>\n"
+        "Бот никогда не запрашивает ваши пароли, коды авторизации или личные сессии.\n\n"
+        "<b>• Хранение данных:</b>\n"
+        "Фиксируются только публичные параметры (Telegram ID, имя и юзернейм) исключительно для сохранения "
+        "вашей истории проверок и подсчёта остатка запросов.\n\n"
+        "<b>• Источники проверки:</b>\n"
+        "Сканирование осуществляется строго по открытым протоколам Telegram Web и Fragment.com.\n\n"
+        "<b>• Безопасность:</b>\n"
+        "База данных защищена и синхронизируется в реальном времени с облачным хранилищем."
+    )
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+
+
+@dp.callback_query(F.data == "info_pricing")
+async def handle_info_pricing(callback: CallbackQuery):
+    await callback.answer()
+    text = (
+        "💳 <b>ТАРИФЫ И УСЛОВИЯ ПОДПИСКИ</b>\n\n"
+        "⚡ <b>Базовый тариф (Free):</b>\n"
+        "• 2 бесплатные проверки любых тегов\n"
+        "• Проверка занятости в Telegram и на Fragment\n"
+        "• Генерация графической карточки статуса в HD\n"
+        "• Стоимость: <b>0 ₽ (Бесплатно)</b>\n\n"
+        "⭐️ <b>PREMIUM PASS (Полный Безлимит):</b>\n"
+        "• ♾ <b>Неограниченное число проверок 24/7</b>\n"
+        "• ⚡ Мгновенный чекер без очередей и ожидания\n"
+        "• 🎯 Неограниченный доступ к свободным 5- и 6-значным тегам\n"
+        "• 🎨 Карточки в Ultra HD качестве с золотым знаком качества\n"
+        "• 👑 VIP статус в профиле\n"
+        "• Стоимость: <b>0 ₽ на этапе тестирования (в 1 клик!)</b>"
+    )
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+
+
+@dp.callback_query(F.data == "info_support")
+async def handle_info_support(callback: CallbackQuery):
+    await callback.answer()
+    text = (
+        "🆘 <b>СЛУЖБА ПОДДЕРЖКИ И СВЯЗЬ</b>\n\n"
+        "Возник вопрос, предложение или нужна помощь с юзернеймом?\n\n"
+        "• <b>Администратор / Разработчик:</b> @nuyuki666\n"
+        "• <b>Telegram ID Администратора:</b> <code>8810231186</code>\n"
+        "• <b>Канал проекта:</b> @UsernameSolisSearch_bot\n"
+        "• <b>Режим ответа:</b> Оперативно в течение нескольких минут.\n\n"
+        "<i>Напишите напрямую администратору при любых вопросах!</i>"
+    )
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+
+
+@dp.callback_query(F.data == "info_features")
+async def handle_info_features(callback: CallbackQuery):
+    await callback.answer()
+    text = (
+        "🧩 <b>КАК РАБОТАЕТ НАШ БОТ</b>\n\n"
+        "<b>1. Алгоритм тройной верификации:</b>\n"
+        "Обычные чекеры показывают ошибку из-за скрытых профилей Telegram. "
+        "Наш бот делает перекрёстный аудит: проверяет статус лота на блокчейне Fragment, "
+        "активность профиля в Telegram и отдаёт только реальный статус:\n"
+        "  • <code>СВОБОДЕН ✅</code> — доступен к регистрации в приложении прямо сейчас\n"
+        "  • <code>ЗАНЯТ ❌</code> — закреплен за пользователем, ботом или каналом\n"
+        "  • <code>FRAGMENT NFT 💎</code> — выставлен на продажу как TON NFT\n\n"
+        "<b>2. Оценка капитализации:</b>\n"
+        "Рассчитывает рыночную стоимость в TON, долларах и рублях на основе длины, буквенной гармонии и истории сделок.\n\n"
+        "<b>3. Рендеринг карточек:</b>\n"
+        "Для каждого тега формируется дизайнерский постер 1000×560 px для публикации в каналах или сохранения себе."
+    )
+    await callback.message.edit_text(text, parse_mode="HTML", reply_markup=info_modal_back_keyboard())
+
+
+@dp.callback_query(F.data == "noop")
+async def handle_noop(callback: CallbackQuery):
+    await callback.answer()
+
+
+# --------------------------------------------------------------------------
+# 3. User Profile Handlers
 # --------------------------------------------------------------------------
 
 @dp.message(F.text == "👤 Мой профиль")
@@ -137,14 +322,14 @@ async def send_user_profile(user_id: int, target_message: Message, user: dict):
     q_info = "♾ <b>Безлимит</b>" if user["is_premium"] else f"<b>{user['queries_left']} из 2</b>"
 
     caption = (
-        f"👤 <b>ЛИЧНЫЙ ПРОФИЛЬ</b>\n\n"
+        f"👤 <b>ЛИЧНЫЙ ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ</b>\n\n"
         f"• <b>Пользователь:</b> {user['full_name']} (@{user['username'] if user['username'] else 'нет'})\n"
         f"• <b>Telegram ID:</b> <code>{user['user_id']}</code>\n"
         f"• <b>Статус:</b> {status_badge}\n"
-        f"• <b>Осталось поисков/проверок:</b> {q_info}\n"
+        f"• <b>Остаток проверок:</b> {q_info}\n"
         f"• <b>Всего выполнено проверок:</b> <b>{user['total_searches']}</b>\n"
         f"• <b>Дата регистрации:</b> {user['registered_at']}\n\n"
-        f"{'💎 <i>У вас сняты все ограничения на проверки.</i>' if user['is_premium'] else '💡 <i>Для безлимитного доступа активируйте Премиум или введите промокод.</i>'}"
+        f"{'💎 <i>У вас сняты все ограничения: любые юзернеймы без очереди.</i>' if user['is_premium'] else '💡 <i>Для безлимитного доступа активируйте Премиум или введите промокод.</i>'}"
     )
 
     await target_message.answer_photo(
@@ -156,7 +341,7 @@ async def send_user_profile(user_id: int, target_message: Message, user: dict):
 
 
 # --------------------------------------------------------------------------
-# 3. Manual Username Checking (User inputs ANY handle)
+# 4. Manual Username Checking (User inputs ANY handle)
 # --------------------------------------------------------------------------
 
 @dp.message(F.text == "🔍 Проверить юзернейм (ввести свой)")
@@ -192,13 +377,21 @@ async def handle_custom_username_input(message: Message, state: FSMContext):
     await execute_username_audit(message, raw)
 
 
-# Catch any text that looks like a username (starts with @ or is a 5-32 char tag)
+# Catch any text that looks like a username (starts with @ or is a 4-32 char tag)
 @dp.message(F.text.regexp(r"^@?[a-zA-Z0-9_]{4,32}$"))
 async def handle_direct_username_message(message: Message, state: FSMContext):
     await state.clear()
     raw = message.text.strip().lstrip("@")
-    # Ignore commands or buttons
-    if raw.startswith("/") or message.text in ["🔍 Проверить юзернейм (ввести свой)", "⚡ Свободный юз (5 симв.)", "✨ Свободный юз (6 симв.)", "👤 Мой профиль", "💎 Купить Премиум", "⚙️ Админ-панель"]:
+    # Ignore commands or button labels
+    if raw.startswith("/") or message.text in [
+        "🔍 Проверить юзернейм (ввести свой)", 
+        "⚡ Свободный юз (5 симв.)", 
+        "✨ Свободный юз (6 симв.)", 
+        "👤 Мой профиль", 
+        "💎 Купить Премиум", 
+        "📜 Меню и тарифы",
+        "⚙️ Админ-панель"
+    ]:
         return
     await execute_username_audit(message, raw)
 
@@ -239,8 +432,9 @@ async def execute_username_audit(message: Message, raw_username: str):
         res = await analyze_username(clean)
         val = res["valuation"]
 
-        # Save to history
+        # Save to local DB & cloud
         db.save_found_username(user_id, clean, len(clean), val["ton"])
+        asyncio.create_task(sync_search_to_cloud(user_id, clean, len(clean), val["ton"]))
 
         # Generate visual card
         card_buffer = create_username_card(clean, val, status_type=res["status_type"])
@@ -279,7 +473,7 @@ async def execute_username_audit(message: Message, raw_username: str):
 
 
 # --------------------------------------------------------------------------
-# 4. Verified Free 5- and 6-Character Handles Search
+# 5. Verified Free 5- and 6-Character Handles Search
 # --------------------------------------------------------------------------
 
 @dp.message(F.text == "⚡ Свободный юз (5 симв.)")
@@ -337,6 +531,7 @@ async def execute_free_search(event: Message | CallbackQuery, length: int):
     try:
         username, val = await find_available_username(length)
         db.save_found_username(user_id, username, length, val["ton"])
+        asyncio.create_task(sync_search_to_cloud(user_id, username, length, val["ton"]))
 
         card_buffer = create_username_card(username, val, status_type="FREE")
         photo = BufferedInputFile(card_buffer.getvalue(), filename=f"free_{username}.png")
@@ -375,7 +570,7 @@ async def execute_free_search(event: Message | CallbackQuery, length: int):
 
 
 # --------------------------------------------------------------------------
-# 5. Premium Subscription & Promocodes
+# 6. Premium Subscription & Promocodes
 # --------------------------------------------------------------------------
 
 @dp.message(F.text == "💎 Купить Премиум")
@@ -396,7 +591,7 @@ async def handle_premium_offer(event: Message | CallbackQuery, state: FSMContext
         "• ♾ <b>Безлимитные проверки любых юзернеймов</b> 24/7\n"
         "• ⚡ Неограниченный доступ к базе свободных 5- и 6-значных тегов\n"
         "• 🎨 Скачивание карточек в Ultra HD\n"
-        "• ⭐️ Золотой бейдж в профиле\n\n"
+        "• ⭐️ Золотой VIP бейдж в профиле\n\n"
         f"Текущий статус: {'⭐️ <b>У ВАС УЖЕ ЕСТЬ ПРЕМИУМ!</b>' if user['is_premium'] else '⚡ <b>Базовый доступ</b>'}\n\n"
         "👇 <i>Активируйте тестовый премиум в 1 клик или введите промокод:</i>"
     )
@@ -417,6 +612,10 @@ async def handle_activate_demo_premium(callback: CallbackQuery):
     db.activate_premium(user_id)
     await callback.answer("⭐️ Премиум успешно активирован!", show_alert=True)
     user = db.get_user(user_id)
+    asyncio.create_task(sync_user_to_cloud(
+        user_id, user["username"], user["full_name"], 
+        True, user["queries_left"], user["total_searches"]
+    ))
     await send_user_profile(user_id, callback.message, user)
 
 
@@ -447,6 +646,10 @@ async def handle_promocode_input(message: Message, state: FSMContext):
 
     if success:
         user = db.get_user(user_id)
+        asyncio.create_task(sync_user_to_cloud(
+            user_id, user["username"], user["full_name"], 
+            bool(user["is_premium"]), user["queries_left"], user["total_searches"]
+        ))
         await message.answer(msg, parse_mode="HTML")
         await send_user_profile(user_id, message, user)
     else:
@@ -458,7 +661,7 @@ async def handle_promocode_input(message: Message, state: FSMContext):
 
 
 # --------------------------------------------------------------------------
-# 6. History
+# 7. History
 # --------------------------------------------------------------------------
 
 @dp.callback_query(F.data == "view_history")
@@ -487,7 +690,7 @@ async def handle_view_history(callback: CallbackQuery):
 
 
 # --------------------------------------------------------------------------
-# 7. Admin Panel Handlers
+# 8. Admin Panel Handlers
 # --------------------------------------------------------------------------
 
 @dp.message(F.text == "⚙️ Админ-панель")
@@ -599,6 +802,11 @@ async def handle_admin_user_card(callback: CallbackQuery):
         return
 
     await callback.answer()
+    await refresh_admin_user_card(callback, user)
+
+
+async def refresh_admin_user_card(callback: CallbackQuery, user: dict):
+    target_id = user["user_id"]
     banned_status = "🚫 <b>ЗАБАНЕН</b>" if user["is_banned"] else "🟢 <b>АКТИВЕН</b>"
     prem_status = "⭐️ <b>PREMIUM (Безлимит)</b>" if user["is_premium"] else "⚡ <b>Базовый (Free)</b>"
     q_left = "БЕЗЛИМИТ" if user["is_premium"] else f"{user['queries_left']} шт."
@@ -725,33 +933,6 @@ async def handle_admin_user_history(callback: CallbackQuery):
     await callback.message.edit_text("\n".join(lines), parse_mode="HTML", reply_markup=kb)
 
 
-async def refresh_admin_user_card(callback: CallbackQuery, user: dict):
-    banned_status = "🚫 <b>ЗАБАНЕН</b>" if user["is_banned"] else "🟢 <b>АКТИВЕН</b>"
-    prem_status = "⭐️ <b>PREMIUM (Безлимит)</b>" if user["is_premium"] else "⚡ <b>Базовый (Free)</b>"
-    q_left = "БЕЗЛИМИТ" if user["is_premium"] else f"{user['queries_left']} шт."
-
-    text = (
-        f"👤 <b>КАРТОЧКА ПОЛЬЗОВАТЕЛЯ</b>\n\n"
-        f"• <b>Telegram ID:</b> <code>{user['user_id']}</code>\n"
-        f"• <b>Имя:</b> {user['full_name']}\n"
-        f"• <b>Юзернейм:</b> @{user['username'] if user['username'] else 'нет'}\n"
-        f"• <b>Статус:</b> {banned_status}\n"
-        f"• <b>Подписка:</b> {prem_status}\n"
-        f"• <b>Остаток запросов:</b> <code>{q_left}</code>\n"
-        f"• <b>Всего проверок:</b> <code>{user['total_searches']}</code>\n"
-        f"• <b>Дата регистрации:</b> {user['registered_at']}\n"
-    )
-    await callback.message.edit_text(
-        text,
-        parse_mode="HTML",
-        reply_markup=admin_user_management_keyboard(
-            target_id=user["user_id"],
-            is_banned=bool(user["is_banned"]),
-            is_premium=bool(user["is_premium"])
-        )
-    )
-
-
 @dp.callback_query(F.data == "adm_search_user")
 async def handle_admin_search_user_prompt(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id not in ADMIN_IDS:
@@ -848,6 +1029,7 @@ async def handle_admin_broadcast_execute(callback: CallbackQuery, state: FSMCont
 
     msg_id = data.get("broadcast_message_id")
     chat_id = data.get("broadcast_chat_id")
+
     if not msg_id:
         await callback.message.answer("❌ Ошибка: сообщение не найдено.")
         return
