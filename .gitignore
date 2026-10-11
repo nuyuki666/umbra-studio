@@ -1,0 +1,13 @@
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary & backup files
+*.tmp
+*.bak
+Umbra Studio — дизайн сайтов на заказ(1).html
+
+# Deployment & dependencies
+.vercel
+node_modules
+.env

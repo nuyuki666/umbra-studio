@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Umbra Studio — дизайн сайтов на заказ</title>
+
+  <!-- Favicon & Touch Icons -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Background Effects -->
+  <div class="neb"></div>
+  <div id="stars"></div>
+  <div id="bar"></div>
+  <div id="banner" hidden></div>
+
+  <!-- Header Navigation -->
+  <header class="nav">
+    <div class="wrap">
+      <a class="logo" href="#top">
+        <img class="logo-icon" src="favicon.png" alt="Umbra" width="26" height="26">
+        <span>Umbra</span>
+      </a>
+      <nav class="links">
+        <a href="#advantages">Преимущества</a>
+        <a href="#plans">Тарифы</a>
+        <a href="#works">Работы</a>
+        <a href="#order">Заказ</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div id="authSlot">
+        <button class="nav-auth-btn" id="inBtn" aria-label="Войти в личный кабинет">
+          <svg class="nav-auth-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Войти</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="top">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="wrap">
+        <p class="lead"><span class="beacon"></span>Мы только открываемся. Делаем <span id="typed"></span><i class="cur"></i></p>
+        <h1>Дизайн сайта, который приводит клиентов</h1>
+        <p class="sub">Разрабатываем интерфейсы для бизнеса: от лендинга до интернет-магазина. Вы оставляете заявку, мы уточняем задачу и называем цену.</p>
+        <div class="row">
+          <a class="btn big" href="#order">Заказать дизайн</a>
+          <a class="btn big ghost" href="#plans">Смотреть тарифы</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marquee Ticker -->
+    <div class="mq">
+      <div>
+        <span>Лендинги</span>
+        <span>Интернет-магазины</span>
+        <span>Редизайн</span>
+        <span>UI-киты</span>
+        <span>Прототипы</span>
+        <span>Адаптив</span>
+      </div>
+    </div>
+
+    <!-- Advantages Section -->
+    <section id="advantages">
+      <div class="wrap">
+        <p class="lead">Надёжность прежде всего.</p>
+        <h2>Работаем по понятным правилам</h2>
+        <div class="g2">
+          <div class="card">
+            <h3>Прозрачный процесс</h3>
+            <p>Фиксируем цену и сроки до старта. Каждый этап согласуем в личном кабинете — без сюрпризов в конце.</p>
+          </div>
+          <div class="card">
+            <h3>Дизайн под задачу</h3>
+            <p>Сначала разбираем вашу аудиторию и конкурентов, затем рисуем. Макет делает сайт продающим, а не просто красивым.</p>
+          </div>
+        </div>
+        <div class="stats">
+          <div>
+            <b>Новая студия</b>
+            <span>каждому проекту уделяем максимум внимания</span>
+          </div>
+          <div>
+            <b>Живое общение</b>
+            <span>отвечаем лично в чате и в Telegram</span>
+          </div>
+          <div>
+            <b>Гибкий бюджет</b>
+            <span>укажите свою сумму — подберём решение</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plans Section -->
+    <section id="plans">
+      <div class="wrap">
+        <p class="lead">Выбор наших клиентов.</p>
+        <h2>Тарифы</h2>
+        <div class="g3">
+          <div class="card plan">
+            <h3>Лендинг</h3>
+            <div class="price" data-p="Лендинг"></div>
+            <ul>
+              <li>До 6 экранов</li>
+              <li>Адаптив под телефон</li>
+              <li>2 круга правок</li>
+              <li>Срок от 5 дней</li>
+            </ul>
+            <button class="btn ghost" data-plan="Лендинг">Заказать</button>
+          </div>
+
+          <div class="card plan hot">
+            <span class="tag">Популярный</span>
+            <h3>Многостраничный сайт</h3>
+            <div class="price" data-p="Многостраничный сайт"></div>
+            <ul>
+              <li>До 12 страниц</li>
+              <li>UI-кит и дизайн-система</li>
+              <li>Прототип для согласования</li>
+              <li>Срок от 14 дней</li>
+            </ul>
+            <button class="btn" data-plan="Многостраничный сайт">Заказать</button>
+          </div>
+
+          <div class="card plan">
+            <h3>Интернет-магазин</h3>
+            <div class="price" data-p="Интернет-магазин"></div>
+            <ul>
+              <li>Каталог, карточка, корзина</li>
+              <li>Личный кабинет покупателя</li>
+              <li>Анимации и микровзаимодействия</li>
+              <li>Срок от 21 дня</li>
+            </ul>
+            <button class="btn ghost" data-plan="Интернет-магазин">Заказать</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Works Portfolio Section -->
+    <section id="works">
+      <div class="wrap">
+        <p class="lead">Портфолио.</p>
+        <h2>Наши работы</h2>
+        <div class="g3" id="wGrid"></div>
+      </div>
+    </section>
+
+    <!-- Order Section -->
+    <section id="order">
+      <div class="wrap split">
+        <div>
+          <p class="lead">Заявка занимает две минуты.</p>
+          <h2>Заказать дизайн</h2>
+          <ol class="steps">
+            <li>
+              <span><b>Опишите задачу</b>Тип сайта, бюджет и сроки.</span>
+            </li>
+            <li>
+              <span><b>Мы свяжемся</b>Уточним детали и пришлём смету.</span>
+            </li>
+            <li>
+              <span><b>Покажем первый экран</b>Согласуем направление и продолжим работу.</span>
+            </li>
+          </ol>
+        </div>
+
+        <form class="card" id="orderForm" novalidate>
+          <div class="f2">
+            <label>
+              Тип проекта
+              <select id="oType">
+                <option>Лендинг</option>
+                <option>Многостраничный сайт</option>
+                <option>Интернет-магазин</option>
+                <option>Редизайн существующего сайта</option>
+              </select>
+            </label>
+            <label>
+              Бюджет
+              <select id="oBud">
+                <option>до 1 500 ₽</option>
+                <option>1 500 – 3 000 ₽</option>
+                <option>3 000 – 5 000 ₽</option>
+                <option>Своя сумма</option>
+              </select>
+              <input id="oSum" class="sum" type="number" min="100" step="100" placeholder="Ваша сумма, ₽" aria-label="Своя сумма" hidden>
+            </label>
+          </div>
+          <label>
+            Название проекта или компании
+            <input id="oName" maxlength="80" placeholder="Например, Кофейня «Зерно»">
+          </label>
+          <label>
+            Опишите задачу
+            <textarea id="oDesc" maxlength="1500" placeholder="Что продаёте, кому, какие сайты нравятся"></textarea>
+          </label>
+          <label>
+            Как с вами связаться
+            <input id="oCon" maxlength="80" placeholder="Telegram или телефон">
+          </label>
+          <p class="closed" id="oClosed" hidden></p>
+          <p class="err" id="oErr"></p>
+          <button class="btn big" style="width:100%">Отправить заказ</button>
+          <p class="note" id="oHint"></p>
+          <p class="legal-disclaimer" style="font-size:12px;color:var(--mu);margin-top:10px;text-align:center">
+            Отправляя форму, вы принимаете условия <a href="#" data-modal="privacy" style="color:var(--ac);text-decoration:underline">Конфиденциальности</a> и <a href="#" data-modal="terms" style="color:var(--ac);text-decoration:underline">Правила пользования</a>.
+          </p>
+        </form>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq">
+      <div class="wrap" style="max-width:820px">
+        <p class="lead">Всё, что важно знать о сотрудничестве.</p>
+        <h2>Вопросы и ответы</h2>
+
+        <details>
+          <summary>Сколько стоит дизайн сайта и из чего складывается цена?</summary>
+          <p>
+            Стоимость складывается из масштаба задачи: количества экранов, уникальности иллюстраций/3D-графики, проработки интерактивных прототипов и дизайн-системы. В наших тарифах указана честная стартовая цена без скрытых доплат. Если у вас ограниченный бюджет или специфическая задача — выберите пункт «Своя сумма» в форме заказа: мы гибко адаптируем объём работ под ваши ресурсы.
+          </p>
+        </details>
+
+        <details>
+          <summary>В какие сроки разрабатывается проект?</summary>
+          <p>
+            Средние сроки зависят от выбранного тарифа: лендинг занимает от 5 рабочих дней, многостраничный сайт — от 14 рабочих дней, а интернет-магазин — от 21 дня. Первую дизайн-концепцию и стилистику главного экрана мы презентуем уже на 3-й рабочий день, чтобы вы сразу оценили визуальное направление и были уверены в результате.
+          </p>
+        </details>
+
+        <details>
+          <summary>Как устроен процесс работы от заявки до финала?</summary>
+          <p>
+            Мы работаем по понятному 4-этапному пайплайну:<br>
+            <b>1. Анализ и структура:</b> изучаем конкурентов, ЦА и составляем прототип будущего сайта.<br>
+            <b>2. Концепция:</b> отрисовываем и утверждаем визуальный стиль первого экрана.<br>
+            <b>3. Дизайн всех страниц:</b> детально прорисовываем десктопные, мобильные и планшетные версии.<br>
+            <b>4. Передача в разработку:</b> собираем UI-кит, экспортируем графику в Figma и готовим макеты к вёрстке.
+          </p>
+        </details>
+
+        <details>
+          <summary>Что конкретно я получу по итогам проекта?</summary>
+          <p>
+            Вы получаете структурированный проект в Figma с организованными Auto Layout и компонентами, кликабельный интерактивный прототип, готовый UI Kit (цвета, шрифты, состояния кнопок и полей ввода), а также архив с экспортированной векторной (SVG) и растровой графикой в оптимизированных форматах WebP/PNG.
+          </p>
+        </details>
+
+        <details>
+          <summary>Входит ли вёрстка и разработка в стоимость?</summary>
+          <p>
+            Базовые тарифы сфокусированы на профессиональном UI/UX дизайне. Однако мы передаём макеты с подробными спецификациями для верстальщиков (Pixel-Perfect) и оказываем бесплатный авторский надзор во время разработки. Если вам нужен сайт «под ключ», мы можем подключить наших проверенных фронтенд-разработчиков.
+          </p>
+        </details>
+
+        <details>
+          <summary>Сколько правок входит в стоимость и как они вносятся?</summary>
+          <p>
+            В каждый тариф заложено 2 полноценных круга аргументированных правок на каждом этапе. Так как структура и текст согласовываются до перехода к визуалу, неожиданностей не возникает: мелкие нюансы правятся в рабочем порядке без задержек.
+          </p>
+        </details>
+
+        <details>
+          <summary>Как происходит оплата и работаете ли вы по договору?</summary>
+          <p>
+            Мы работаем официально: оформляем договор с юридическими и физическими лицами (самозанятые/ИП/ООО), выдаём счета и акты. Стандартный порядок — предоплата 50% перед стартом и остаток 50% после утверждения финальных макетов перед передачей исходников.
+          </p>
+        </details>
+
+        <details>
+          <summary>Что нужно предоставить до начала работы?</summary>
+          <p>
+            Информация о вашем бизнесе, тексты или тезисы о продукте, логотип и фирменный стиль (если есть), а также 2–3 примера сайтов, которые вам нравятся или категорически не нравятся. Если текстов нет — поможем составить смысловую структуру и бриф.
+          </p>
+        </details>
+
+        <details>
+          <summary>Адаптируете ли вы дизайн под мобильные телефоны?</summary>
+          <p>
+            Обязательно. До 80% аудитории открывают сайты со смартфонов. Каждый тариф включает адаптивные версии под экраны мобильных устройств (375–390px) и планшетов с учётом удобства нажатия и эргономики интерфейса.
+          </p>
+        </details>
+
+        <details>
+          <summary>Что если нам требуется подписать соглашение о неразглашении (NDA)?</summary>
+          <p>
+            Без проблем. Мы ценим конфиденциальность коммерческой тайны и готовы подписать соглашение NDA до передачи материалов и детального погружения в задачу.
+          </p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-brand">
+        <img class="footer-logo" src="favicon.png" alt="Umbra Studio" width="20" height="20">
+        <span>© 2026 Umbra Studio</span>
+      </div>
+      <nav>
+        <a href="#" data-modal="privacy">Конфиденциальность</a>
+        <a href="#" data-modal="terms">Правила пользования</a>
+        <a href="#" data-modal="cookies">Политика cookie</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- Dialog: Авторизация -->
+  <dialog id="auth">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <div class="dialog-brand-head">
+      <img src="favicon.png" alt="Umbra" width="30" height="30">
+      <h3 id="aTitle" style="font-size:1.3rem">Вход</h3>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="on" data-tab="login" type="button">Вход</button>
+      <button data-tab="reg" type="button">Регистрация</button>
+    </div>
+    <p class="note" id="aMsg" style="margin:-8px 0 14px;display:none;color:var(--ac)"></p>
+    <form id="aForm" novalidate autocomplete="on">
+      <label id="nameRow" hidden>Имя<input id="aName" autocomplete="name" maxlength="40"></label>
+      <label><span id="mailLabelText">Email или логин</span><input id="aMail" type="text" autocomplete="username" placeholder="name@site.ru или логин"></label>
+      <label>
+        Пароль
+        <span class="pw">
+          <input id="aPass" type="password" autocomplete="current-password">
+          <button type="button" id="eye">Показать</button>
+        </span>
+      </label>
+      <div class="meter" id="meter" hidden><i></i><i></i><i></i><i></i></div>
+      
+      <!-- Cloudflare Turnstile Stub -->
+      <div class="cf" id="cf" role="checkbox" aria-checked="false" tabindex="0">
+        <span class="box"></span>
+        <span id="cfT">Подтвердите, что вы человек</span>
+        <em>Cloudflare<br>Turnstile</em>
+      </div>
+      <p class="err" id="aErr"></p>
+      <button class="btn big" style="width:100%" id="aGo">Войти</button>
+      <p class="note" id="aSw"></p>
+    </form>
+  </dialog>
+
+  <!-- Dialog: Вход в админ-панель -->
+  <dialog id="admLogin">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <h3 id="alT" style="font-size:1.3rem;margin-bottom:18px"></h3>
+    <form id="alF">
+      <label>Пароль<input id="alP" type="password" autocomplete="current-password"></label>
+      <p class="err" id="alE"></p>
+      <button class="btn big" style="width:100%">Войти</button>
+    </form>
+    <p class="note">Демо-режим: пароль и данные хранятся в этом браузере.</p>
+  </dialog>
+
+  <!-- Dialog: Админ-панель -->
+  <dialog id="adm">
+    <div class="ah">
+      <img src="favicon.png" alt="Umbra" width="22" height="22">
+      <h3 style="font-size:1.2rem">Админ-панель</h3>
+      <button class="x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <div id="admTabs">
+      <button data-t="ov">Обзор</button>
+      <button data-t="or">Заказы</button>
+      <button data-t="us">Клиенты</button>
+      <button data-t="wk">Работы</button>
+      <button data-t="pr">Цены</button>
+      <button data-t="ch">Чат</button>
+      <button data-t="st">Настройки</button>
+    </div>
+    <div id="admBody"></div>
+  </dialog>
+
+  <!-- Dialog: Заказ успешно отправлен -->
+  <dialog id="okd" style="text-align:center">
+    <svg class="ck" viewBox="0 0 52 52" width="76" height="76">
+      <circle cx="26" cy="26" r="24" fill="none" stroke="#6fdc9a" stroke-width="2"/>
+      <path d="M14 27l8 8 16-17" fill="none" stroke="#6fdc9a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h3 style="margin:14px 0 8px">Заказ отправлен</h3>
+    <p class="note" id="okT" style="margin:0 0 22px"></p>
+    <button class="btn" data-close>Отлично</button>
+  </dialog>
+
+  <!-- Dialog: Мои заказы -->
+  <dialog id="orders">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <h3 style="font-size:1.3rem;margin-bottom:18px">Мои заказы</h3>
+    <div id="ordList"></div>
+  </dialog>
+
+  <!-- Dialog: Личный кабинет и профиль -->
+  <dialog id="profileDialog" class="profile-dialog">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <div class="profile-header">
+      <div class="profile-avatar" id="profAvatar">U</div>
+      <div class="profile-user-info">
+        <h3 id="profHeadName">Профиль</h3>
+        <p class="profile-meta"><span id="profHeadEmail"></span><span class="badge-role">Клиент</span></p>
+      </div>
+    </div>
+
+    <!-- Табы профиля -->
+    <div class="tabs profile-tabs" role="tablist">
+      <button class="on" data-ptab="info" type="button">Данные профиля</button>
+      <button data-ptab="security" type="button">Смена пароля</button>
+    </div>
+
+    <!-- Вкладка: Данные профиля -->
+    <div id="profTabInfo" class="profile-tab-content">
+      <form id="profInfoForm" novalidate autocomplete="on">
+        <label>
+          Имя
+          <input id="profName" type="text" autocomplete="name" maxlength="40" placeholder="Ваше имя">
+        </label>
+        <label>
+          Логин / Email (аккаунт)
+          <input id="profLogin" type="text" autocomplete="username" readonly tabindex="-1" style="opacity:0.72;cursor:default">
+        </label>
+        <label>
+          Телефон или Telegram для связи
+          <input id="profPhone" type="text" autocomplete="tel" maxlength="50" placeholder="@username или +7 (999) 000-00-00">
+        </label>
+        <label>
+          Компания или название проекта
+          <input id="profCompany" type="text" autocomplete="organization" maxlength="80" placeholder="Название компании или проекта">
+        </label>
+        <p class="err" id="profInfoErr"></p>
+        <p class="ok-msg" id="profInfoOk" hidden></p>
+        <button class="btn big" style="width:100%" type="submit">Сохранить изменения</button>
+      </form>
+    </div>
+
+    <!-- Вкладка: Безопасность и смена пароля -->
+    <div id="profTabSecurity" class="profile-tab-content" hidden>
+      <form id="profPassForm" novalidate autocomplete="off">
+        <label>
+          Текущий пароль
+          <span class="pw">
+            <input id="profOldPass" type="password" autocomplete="current-password" placeholder="Введите текущий пароль">
+            <button type="button" class="eye-toggle" data-for="profOldPass">Показать</button>
+          </span>
+        </label>
+        <label>
+          Новый пароль
+          <span class="pw">
+            <input id="profNewPass" type="password" autocomplete="new-password" placeholder="Минимум 8 символов, буквы и цифры">
+            <button type="button" class="eye-toggle" data-for="profNewPass">Показать</button>
+          </span>
+        </label>
+        <div class="meter" id="profMeter"><i></i><i></i><i></i><i></i></div>
+        <label>
+          Повторите новый пароль
+          <span class="pw">
+            <input id="profConfPass" type="password" autocomplete="new-password" placeholder="Повторите новый пароль">
+            <button type="button" class="eye-toggle" data-for="profConfPass">Показать</button>
+          </span>
+        </label>
+        <p class="err" id="profPassErr"></p>
+        <p class="ok-msg" id="profPassOk" hidden></p>
+        <button class="btn big" style="width:100%" type="submit">Обновить пароль</button>
+      </form>
+    </div>
+
+    <!-- Дополнительные действия -->
+    <div class="profile-actions">
+      <button class="btn ghost profile-orders-btn" id="profOrdersBtn" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Мои заказы (<b id="profOrderCount">0</b>)</span>
+      </button>
+      <button class="btn ghost profile-logout-btn" id="profLogoutBtn" type="button" title="Выйти из этого аккаунта">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Выйти</span>
+      </button>
+    </div>
+  </dialog>
+
+
+  <!-- Dialog: Политика конфиденциальности -->
+  <dialog id="modalPrivacy" class="legal-dialog">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <h3>Политика конфиденциальности</h3>
+    <div class="legal-meta">Редакция от 11 октября 2026 г. · В соответствии с Федеральным законом № 152-ФЗ «О персональных данных»</div>
+    <div class="legal-content">
+      <h4>1. Общие положения</h4>
+      <p>
+        Настоящая Политика конфиденциальности устанавливает порядок обработки и защиты персональной информации пользователей, которую дизайн-студия «Umbra Studio» (далее — Студия) получает при использовании сайта, формы заказа и встроенных сервисов коммуникации.
+      </p>
+      
+      <h4>2. Состав собираемых персональных данных</h4>
+      <p>Студия обрабатывает следующие данные, предоставляемые Пользователем добровольно:</p>
+      <ul>
+        <li>Имя, фамилия или наименование компании;</li>
+        <li>Контактный адрес электронной почты (email);</li>
+        <li>Контактные данные для оперативной связи (номер телефона, Telegram-аккаунт);</li>
+        <li>Информация о проекте и содержании задачи, указанная в форме брифа;</li>
+        <li>Технические данные: IP-адрес, данные cookie и параметры пользовательского устройства.</li>
+      </ul>
+
+      <h4>3. Цели обработки персональных данных</h4>
+      <p>Персональные данные собираются исключительно в следующих целях:</p>
+      <ul>
+        <li>Обработка входящих обращений и расчёт персональной сметы стоимости дизайна;</li>
+        <li>Заключение и исполнение договоров на оказание дизайнерских услуг;</li>
+        <li>Идентификация клиента в личном кабинете и информирование о статусе заказа;</li>
+        <li>Оказание оперативной клиентской поддержки в онлайн-чате.</li>
+      </ul>
+
+      <h4>4. Защита и конфиденциальность информации</h4>
+      <p>
+        Студия принимает необходимые организационные и технические меры для защиты персональных данных от неправомерного или случайного доступа, уничтожения, изменения, блокирования и распространения. Мы никогда не продаём и не передаём персональные данные третьим лицам, за исключением случаев, прямо предусмотренных действующим законодательством РФ.
+      </p>
+
+      <h4>5. Сроки хранения и права субъекта</h4>
+      <p>
+        Данные хранятся в течение срока, необходимого для достижения целей обработки, либо до момента отзыва согласия Пользователем. Пользователь вправе в любой момент направить запрос на уточнение, блокировку или удаление своих персональных данных через чат поддержки на сайте или в Telegram.
+      </p>
+    </div>
+  </dialog>
+
+  <!-- Dialog: Правила пользования сервисом -->
+  <dialog id="modalTerms" class="legal-dialog">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <h3>Правила пользования сервисом</h3>
+    <div class="legal-meta">Редакция от 11 октября 2026 г. · Пользовательское соглашение Umbra Studio</div>
+    <div class="legal-content">
+      <h4>1. Предмет соглашения</h4>
+      <p>
+        Настоящее Пользовательское соглашение регулирует порядок взаимодействия между студией «Umbra Studio» и физическими или юридическими лицами (Заказчиками), использующими сайт для ознакомления с услугами и направления заявок на разработку дизайна.
+      </p>
+
+      <h4>2. Порядок оформления заявок и согласования стоимости</h4>
+      <p>
+        Информация о тарифах, размещённая на сайте, носит ознакомительный характер и не является публичной офертой в соответствии со ст. 437 ГК РФ. Окончательная смета, перечень экранов, функционал и дедлайн фиксируются в официальном договоре и техническом задании после уточнения всех деталей проекта.
+      </p>
+
+      <h4>3. Интеллектуальные права и передача исходников</h4>
+      <p>
+        Все графические элементы, тексты и макеты, размещённые на настоящем сайте, являются интеллектуальной собственностью Студии. Исключительные имущественные права на созданный по заказу клиента дизайн передаются Заказчику в полном объёме сразу после 100% оплаты согласованной сметы. Студия сохраняет за собой право демонстрировать выполненные работы в портфолио, если договором не предусмотрен режим строгой конфиденциальности (NDA).
+      </p>
+
+      <h4>4. Регламент согласования и правок</h4>
+      <p>
+        В стоимость каждого тарифа заложено 2 полных круга правок на каждом утверждённом этапе работ. Дополнительные требования, выходящие за рамки согласованного технического задания или радикально меняющие концепцию после её утверждения, оцениваются и оплачиваются отдельно.
+      </p>
+
+      <h4>5. Ограничение ответственности</h4>
+      <p>
+        Сайт и демонстрационный личный кабинет предоставляются по принципу «как есть». Студия стремится к бесперебойной работе всех сервисов, но не несёт ответственности за временные перебои на стороне хостинг-провайдеров или каналов связи.
+      </p>
+    </div>
+  </dialog>
+
+  <!-- Dialog: Политика файлов cookie -->
+  <dialog id="modalCookies" class="legal-dialog">
+    <button class="x" data-close aria-label="Закрыть">×</button>
+    <h3>Политика файлов cookie</h3>
+    <div class="legal-meta">Редакция от 11 октября 2026 г. · Использование cookie и локального хранилища</div>
+    <div class="legal-content">
+      <h4>1. Что такое файлы cookie?</h4>
+      <p>
+        Файлы cookie (куки) и веб-хранилище (LocalStorage) — это небольшие фрагменты данных, сохраняемые вашим браузером для запоминания настроек, параметров сеанса и улучшения удобства взаимодействия с веб-страницей.
+      </p>
+
+      <h4>2. Какие категории данных мы используем?</h4>
+      <ul>
+        <li>
+          <b>Технические (обязательные):</b> необходимы для авторизации, запоминания активной пользовательской сессии, работы демо-кабинета и обеспечения безопасности от спам-ботов (Cloudflare Turnstile).
+        </li>
+        <li>
+          <b>Функциональные:</b> сохраняют состояние онлайн-чата поддержки, чтобы вы не теряли переписку с оператором при перезагрузке страницы, а также черновик формы заявки.
+        </li>
+        <li>
+          <b>Аналитические:</b> обезличенные метрики посещаемости для улучшения структуры сайта и скорости загрузки страниц.
+        </li>
+      </ul>
+
+      <h4>3. Использование LocalStorage</h4>
+      <p>
+        Настоящий сайт использует безопасное хранилище браузера (LocalStorage) для автономного хранения ваших локальных настроек, списка оформленных демо-заказов и фиксации согласия с данной политикой. Эти данные не передаются неавторизованным сторонним трекерам.
+      </p>
+
+      <h4>4. Управление и отключение cookie</h4>
+      <p>
+        Вы можете в любой момент изменить настройки браузера, чтобы заблокировать или очистить файлы cookie. Обратите внимание, что отключение обязательных файлов может повлечь недоступность некоторых функций личного кабинета и отправки формы.
+      </p>
+    </div>
+  </dialog>
+
+  <!-- Floating Cookie Consent Banner -->
+  <div id="cookieBanner" class="cookie-banner" hidden>
+    <div class="cookie-banner-text">
+      <strong>Мы используем файлы cookie</strong>
+      Мы используем cookie и локальное хранилище для авторизации, сохранения переписки и стабильной работы сайта. Подробнее в нашей <a href="#" data-modal="cookies">Политике cookie</a>.
+    </div>
+    <div class="cookie-banner-actions">
+      <button class="btn" id="acceptCookies">Принять</button>
+      <button class="btn ghost" data-close-banner onclick="this.closest('.cookie-banner').setAttribute('hidden','')">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Live Support Chat Widget -->
+  <button id="chatBtn" aria-label="Открыть чат поддержки">
+    <svg class="chat-open-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+    </svg>
+    <svg class="chat-close-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+  <section id="chat" aria-label="Чат поддержки" style="padding:0">
+    <div class="ch">
+      <img class="chat-brand-icon" src="favicon.png" alt="Umbra" width="22" height="22">
+      <i></i>
+      <div>
+        <strong>Поддержка Umbra</strong>
+        <small>Ответим как можно скорее</small>
+      </div>
+      <button class="x" id="chatX" aria-label="Свернуть">×</button>
+    </div>
+    <div id="msgs" aria-live="polite"></div>
+    <div class="qs">
+      <button>Стоимость</button>
+      <button>Сроки</button>
+      <button>Как оплатить</button>
+      <button>Позвать оператора</button>
+    </div>
+    <form id="cf2">
+      <input id="cIn" placeholder="Напишите сообщение" maxlength="500" autocomplete="off">
+      <button class="btn">Отправить</button>
+    </form>
+  </section>
+
+  <!-- Toast alerts -->
+  <div id="toast" role="status"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/utils.js" defer></script>
+  <script src="js/animations.js" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/orders.js" defer></script>
+  <script src="js/chat.js" defer></script>
+  <script src="js/admin.js" defer></script>
+  <script src="js/main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+/* ==========================================================================
+   Animations & Motion Design
+   ========================================================================== */
+
+/* Nebula drift background */
+@keyframes drift {
+  to {
+    transform: scale(1.12) translate(-1.5%, 1.5%);
+  }
+}
+
+/* Ambient hero glow shapes floating */
+@keyframes flt {
+  to {
+    transform: translate(40px, -30px) scale(1.15);
+  }
+}
+
+/* Typewriter caret blinking */
+@keyframes bl {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Infinite marquee ticker */
+@keyframes mq {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Highlighted tariff card breathing glow */
+@keyframes glow {
+  to {
+    box-shadow: 0 0 44px rgba(169, 165, 255, 0.22);
+  }
+}
+
+/* Spinner loader (Turnstile check) */
+@keyframes sp {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Modal pop-in transition */
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+
+/* Modal backdrop fade */
+@keyframes fd {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Order confirmed checkmark draw animation */
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Slide reveal (accordion, message bubbles) */
+@keyframes sl {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Support chat window popup */
+@keyframes ci {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+  }
+}
+
+/* Chat button pulsing ring ripple */
+@keyframes rg {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+/* Flash pulse for order form when selecting a plan */
+@keyframes fl {
+  30% {
+    box-shadow: 0 0 0 3px rgba(169, 165, 255, 0.55), 0 0 50px rgba(169, 165, 255, 0.3);
+  }
+}
+
+/* Validation shake animation */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-7px);
+  }
+  40%, 80% {
+    transform: translateX(7px);
+  }
+}
+
+.shake {
+  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+}
+
+/* Modal Spring pop-in transition */
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(24px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Smooth FAQ accordion slide */
+@keyframes faqSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Live beacon radar dot pulsing */
+@keyframes beaconPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(111, 220, 154, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 9px rgba(111, 220, 154, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(111, 220, 154, 0);
+  }
+}
+
+.beacon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  margin-right: 8px;
+  vertical-align: 1px;
+  animation: beaconPulse 2.2s infinite ease-in-out;
+}
+
+/* Chat bubble entrance */
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Scroll Reveal & Dynamic Motion Classes
+   -------------------------------------------------------------------------- */
+
+.rv {
+  opacity: 0;
+  transform: translateY(34px) scale(0.97);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.rv.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Interactive Card Spotlight */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(169, 165, 255, 0.15), transparent 65%);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Button sweep light sheen */
+.btn:not(.ghost)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+
+.btn:not(.ghost):hover::after {
+  transform: translateX(120%);
+  transition: transform 0.7s;
+}
+
+/* Interactive element animations */
+.cur {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--ac);
+  margin-left: 3px;
+  vertical-align: -0.15em;
+  animation: bl 1s steps(2) infinite;
+}
+
+.plan.hot {
+  animation: glow 3.5s ease-in-out infinite alternate;
+}
+
+.sum {
+  animation: pop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+dialog[open] {
+  animation: dialogIn 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+dialog[open]::backdrop {
+  animation: fd 0.35s;
+}
+
+.ck circle,
+.ck path {
+  stroke-dasharray: 160;
+  stroke-dashoffset: 160;
+}
+
+dialog[open] .ck circle {
+  animation: dash 0.8s forwards;
+}
+
+dialog[open] .ck path {
+  animation: dash 0.6s 0.5s forwards;
+}
+
+details[open] p {
+  animation: faqSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#chat.open {
+  animation: ci 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: bottom right;
+}
+
+#msgs .m:last-child {
+  animation: bubbleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#chatBtn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--ac);
+  pointer-events: none;
+  animation: rg 2.6s ease-out infinite;
+}
+
+.flash {
+  animation: fl 1.3s;
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility & Reduced Motion Preferences
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .neb {
+    animation: none;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+  
+  * {
+    transition: none !important;
+  }
+  
+  .rv {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .hero::before,
+  .hero::after,
+  #chatBtn::after,
+  .cur,
+  .mq div,
+  .plan.hot {
+    animation: none;
+  }
+}

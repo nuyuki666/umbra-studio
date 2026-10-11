@@ -1,0 +1,23 @@
+/* ==========================================================================
+   Design Tokens & CSS Variables
+   ========================================================================== */
+
+:root {
+  /* Color Palette */
+  --bg: #0b0b0e;
+  --s: rgba(255, 255, 255, 0.045);
+  --s2: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.1);
+  --tx: #ececf2;
+  --mu: #a8a8b8;
+  --ac: #a9a5ff;
+  --ac2: #7570e6;
+  --ok: #6fdc9a;
+  --er: #ff7a8a;
+
+  /* Color Scheme & Safe Areas */
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
