@@ -10,15 +10,18 @@ from aiogram.types import (
 
 
 def main_menu_reply_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
-    """Persistent bottom navigation keyboard (with admin access if privileged)"""
+    """Persistent bottom navigation keyboard"""
     kb = [
         [
-            KeyboardButton(text="🔍 Поиск юзернейма"),
-            KeyboardButton(text="👤 Мой профиль")
+            KeyboardButton(text="🔍 Проверить юзернейм (ввести свой)"),
         ],
         [
-            KeyboardButton(text="💎 Купить Премиум"),
-            KeyboardButton(text="ℹ️ О сервисе")
+            KeyboardButton(text="⚡ Свободный юз (5 симв.)"),
+            KeyboardButton(text="✨ Свободный юз (6 симв.)")
+        ],
+        [
+            KeyboardButton(text="👤 Мой профиль"),
+            KeyboardButton(text="💎 Купить Премиум")
         ]
     ]
     if is_admin:
@@ -27,30 +30,38 @@ def main_menu_reply_keyboard(is_admin: bool = False) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True, is_persistent=True)
 
 
-def length_choice_inline_keyboard() -> InlineKeyboardMarkup:
-    """Choose username length (5 or 6 characters)"""
-    kb = [
-        [
-            InlineKeyboardButton(text="⚡ 5 символов (Редкие)", callback_data="search_len_5"),
-            InlineKeyboardButton(text="✨ 6 символов (Красивые)", callback_data="search_len_6")
-        ],
-        [
-            InlineKeyboardButton(text="👤 Мой профиль", callback_data="open_profile"),
-            InlineKeyboardButton(text="💎 Безлимит Премиум", callback_data="open_premium")
-        ]
-    ]
+def username_check_result_inline_keyboard(username: str, is_free: bool, status_type: str) -> InlineKeyboardMarkup:
+    """Action buttons based on real status of the checked handle"""
+    kb = []
+    if is_free:
+        kb.append([
+            InlineKeyboardButton(text=f"🔗 Занять @{username} в Telegram", url=f"https://t.me/{username}")
+        ])
+    elif status_type == "FRAGMENT":
+        kb.append([
+            InlineKeyboardButton(text=f"💎 Открыть лот @{username} на Fragment", url=f"https://fragment.com/username/{username}")
+        ])
+    else:
+        kb.append([
+            InlineKeyboardButton(text=f"👤 Открыть профиль @{username}", url=f"https://t.me/{username}")
+        ])
+
+    kb.append([
+        InlineKeyboardButton(text="🔍 Проверить другой юзернейм", callback_data="prompt_check_custom"),
+        InlineKeyboardButton(text="👤 В профиль", callback_data="open_profile")
+    ])
     return InlineKeyboardMarkup(inline_keyboard=kb)
 
 
-def username_result_inline_keyboard(username: str, length: int) -> InlineKeyboardMarkup:
-    """Actions after username is found"""
+def free_found_inline_keyboard(username: str, length: int) -> InlineKeyboardMarkup:
+    """Actions after free username is found from base"""
     kb = [
         [
-            InlineKeyboardButton(text=f"🔗 Занять @{username}", url=f"https://t.me/{username}")
+            InlineKeyboardButton(text=f"🔗 Занять @{username} прямо сейчас", url=f"https://t.me/{username}")
         ],
         [
-            InlineKeyboardButton(text=f"🔄 Искать ещё ({length} симв.)", callback_data=f"search_len_{length}"),
-            InlineKeyboardButton(text="🔍 Другая длина", callback_data="menu_search")
+            InlineKeyboardButton(text=f"🔄 Найти ещё ({length} симв.)", callback_data=f"search_len_{length}"),
+            InlineKeyboardButton(text="🔍 Проверить свой", callback_data="prompt_check_custom")
         ],
         [
             InlineKeyboardButton(text="👤 В профиль", callback_data="open_profile"),
@@ -68,12 +79,12 @@ def profile_inline_keyboard(is_premium: bool = False) -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="💎 Купить Премиум (Безлимит)", callback_data="open_premium")
         ])
     kb.append([
-        InlineKeyboardButton(text="🔍 Начать поиск", callback_data="menu_search"),
+        InlineKeyboardButton(text="🔍 Проверить юзернейм", callback_data="prompt_check_custom"),
         InlineKeyboardButton(text="🎟 Ввести промокод", callback_data="enter_promocode")
     ])
     kb.append([
         InlineKeyboardButton(text="📜 Последние находки", callback_data="view_history"),
-        InlineKeyboardButton(text="🔄 Обновить", callback_data="open_profile")
+        InlineKeyboardButton(text="🔄 Обновить профиль", callback_data="open_profile")
     ])
     return InlineKeyboardMarkup(inline_keyboard=kb)
 
@@ -88,7 +99,7 @@ def premium_offer_inline_keyboard() -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="🎟 Активировать промокод", callback_data="enter_promocode")
         ],
         [
-            InlineKeyboardButton(text="🔍 Поиск юзернеймов", callback_data="menu_search"),
+            InlineKeyboardButton(text="🔍 Проверить юзернейм", callback_data="prompt_check_custom"),
             InlineKeyboardButton(text="👤 В профиль", callback_data="open_profile")
         ]
     ]
@@ -114,7 +125,6 @@ def no_queries_left_inline_keyboard() -> InlineKeyboardMarkup:
 # --------------------------------------------------------------------------
 
 def admin_main_keyboard() -> InlineKeyboardMarkup:
-    """Control dashboard for administrators"""
     kb = [
         [
             InlineKeyboardButton(text="📊 Аналитика и статистика", callback_data="adm_stats"),
@@ -136,7 +146,6 @@ def admin_main_keyboard() -> InlineKeyboardMarkup:
 
 
 def admin_users_pagination_keyboard(users: list, current_page: int, total_pages: int) -> InlineKeyboardMarkup:
-    """List of users with pagination and quick inspection"""
     kb = []
     for u in users:
         badge = "🚫" if u.get("is_banned") else ("⭐️" if u.get("is_premium") else "👤")
@@ -161,7 +170,6 @@ def admin_users_pagination_keyboard(users: list, current_page: int, total_pages:
 
 
 def admin_user_management_keyboard(target_id: int, is_banned: bool, is_premium: bool) -> InlineKeyboardMarkup:
-    """Comprehensive user management options: ban/unban, premium, bonus queries"""
     ban_btn_text = "🟢 Разбанить пользователя" if is_banned else "🚫 Забанить пользователя"
     ban_cb = f"adm_action_unban_{target_id}" if is_banned else f"adm_action_ban_{target_id}"
 
