@@ -12,4 +12,7 @@ Umbra Studio — дизайн сайтов на заказ(1).html
 node_modules
 .env
 
-.vercel
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.sqlite3
