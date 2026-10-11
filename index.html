@@ -19,8 +19,8 @@
   <link rel="stylesheet" href="css/animations.css">
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Cloudflare Turnstile Script -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Cloudflare Turnstile Script (explicit rendering) -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </head>
 <body>
   <!-- Background Effects -->
@@ -360,8 +360,8 @@
       <div class="meter" id="meter" hidden><i></i><i></i><i></i><i></i></div>
       
       <!-- Real Cloudflare Turnstile Widget -->
-      <div class="cf-turnstile-wrap" style="margin:14px 0 10px;display:flex;justify-content:center;">
-        <div class="cf-turnstile" id="authTurnstile" data-sitekey="0x4AAAAAAAE5HJWQLkBk8CiF" data-theme="dark" data-size="flexible"></div>
+      <div class="cf-turnstile-wrap" id="turnstileWrap">
+        <div id="authTurnstile"></div>
       </div>
       <p class="err" id="aErr"></p>
       <button class="btn big" style="width:100%" id="aGo">Войти</button>

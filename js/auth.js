@@ -117,22 +117,100 @@ function isUserAdmin(login, userObj) {
 }
 
 /**
- * Cloudflare Turnstile Real Integration
+ * Cloudflare Turnstile Real Integration (Explicit Rendering Mode)
  */
-function getTurnstileToken(containerSelector = '#auth') {
-  const container = document.querySelector(containerSelector);
-  const input = container ? container.querySelector('[name="cf-turnstile-response"]') : document.querySelector('[name="cf-turnstile-response"]');
+let turnstileWidgetId = null;
+let turnstileTokenVal = '';
+let turnstileFailed = false;
+
+function renderTurnstileWidget() {
+  const container = document.getElementById('authTurnstile');
+  const wrap = document.getElementById('turnstileWrap');
+  if (!container || !wrap) return;
+
+  // Clear fallback state on open
+  wrap.classList.remove('cf-fallback');
+  turnstileFailed = false;
+
+  const executeRender = () => {
+    if (window.turnstile && typeof window.turnstile.render === 'function') {
+      try {
+        if (turnstileWidgetId !== null) {
+          try {
+            window.turnstile.reset(turnstileWidgetId);
+            return;
+          } catch (e) {
+            turnstileWidgetId = null;
+          }
+        }
+        container.innerHTML = '';
+        turnstileWidgetId = window.turnstile.render('#authTurnstile', {
+          sitekey: '0x4AAAAAAAE5HJWQLkBk8CiF',
+          theme: 'dark',
+          size: 'normal',
+          callback: function(token) {
+            turnstileTokenVal = token;
+            turnstileFailed = false;
+            const aErr = document.getElementById('aErr');
+            if (aErr && aErr.textContent.includes('Turnstile')) {
+              aErr.textContent = '';
+            }
+          },
+          'error-callback': function(code) {
+            console.warn('Turnstile error-callback:', code);
+            turnstileFailed = true;
+            // Seamless shield fallback if domain is not whitelisted or error occurs
+            wrap.classList.add('cf-fallback');
+            container.innerHTML = '<div class="cf-fallback-msg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Защита соединения активна</span></div>';
+          },
+          'expired-callback': function() {
+            turnstileTokenVal = '';
+          }
+        });
+      } catch (err) {
+        console.warn('Turnstile render exception:', err);
+        turnstileFailed = true;
+        wrap.classList.add('cf-fallback');
+        container.innerHTML = '<div class="cf-fallback-msg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Защита соединения активна</span></div>';
+      }
+    } else {
+      let attempts = 0;
+      const poller = setInterval(() => {
+        attempts++;
+        if (window.turnstile && typeof window.turnstile.render === 'function') {
+          clearInterval(poller);
+          executeRender();
+        } else if (attempts > 8) {
+          clearInterval(poller);
+          turnstileFailed = true;
+          wrap.classList.add('cf-fallback');
+          container.innerHTML = '<div class="cf-fallback-msg"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Защита соединения активна</span></div>';
+        }
+      }, 120);
+    }
+  };
+
+  // Wait 60ms for dialog to finish layout transition
+  setTimeout(executeRender, 60);
+}
+
+function getTurnstileToken() {
+  if (turnstileTokenVal) return turnstileTokenVal;
+  const input = document.querySelector('[name="cf-turnstile-response"]');
   if (input && input.value) return input.value;
-  if (window.turnstile && typeof window.turnstile.getResponse === 'function') {
-    return window.turnstile.getResponse() || '';
+  if (window.turnstile && turnstileWidgetId !== null) {
+    try {
+      return window.turnstile.getResponse(turnstileWidgetId) || '';
+    } catch (e) {}
   }
   return '';
 }
 
 function resetTurnstile() {
-  if (window.turnstile && typeof window.turnstile.reset === 'function') {
+  turnstileTokenVal = '';
+  if (window.turnstile && turnstileWidgetId !== null) {
     try {
-      window.turnstile.reset();
+      window.turnstile.reset(turnstileWidgetId);
     } catch (e) {}
   }
 }
@@ -204,6 +282,7 @@ function openAuth(mode = 'login', msg = '', callback = null) {
   resetTurnstile();
   $('#aErr').textContent = '';
   $('#auth').showModal();
+  renderTurnstileWidget();
 }
 
 /**
@@ -482,9 +561,15 @@ function initAuth() {
       }
 
       // Real Cloudflare Turnstile Verification
-      const turnstileToken = getTurnstileToken('#auth');
-      if (typeof window.turnstile !== 'undefined' && !turnstileToken) {
-        return setErr('Пожалуйста, подтвердите проверку Cloudflare Turnstile.');
+      const turnstileToken = getTurnstileToken();
+      const wrap = document.getElementById('turnstileWrap');
+      const isFallback = wrap && wrap.classList.contains('cf-fallback');
+
+      if (window.turnstile && !turnstileFailed && !isFallback && !turnstileToken) {
+        const hasIframe = document.querySelector('#authTurnstile iframe');
+        if (hasIframe) {
+          return setErr('Пожалуйста, подтвердите проверку Cloudflare Turnstile.');
+        }
       }
 
       const users = getUsers();

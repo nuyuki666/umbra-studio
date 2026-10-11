@@ -7,6 +7,7 @@
    -------------------------------------------------------------------------- */
 
 html {
+  box-sizing: border-box;
   scroll-padding-top: calc(80px + env(safe-area-inset-top, 0px));
   scroll-behavior: smooth;
 }
@@ -360,6 +361,7 @@ section {
   position: relative;
   padding: 140px 0 120px;
   text-align: center;
+  overflow: hidden;
 }
 
 .hero::before,
@@ -1016,6 +1018,53 @@ dialog::backdrop {
   text-decoration: underline;
 }
 
+/* Real Cloudflare Turnstile Widget */
+.cf-turnstile-wrap {
+  min-height: 65px;
+  width: 100%;
+  margin: 14px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 4px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.cf-turnstile-wrap iframe {
+  border-radius: 10px !important;
+  background: transparent !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.cf-turnstile-wrap.cf-fallback {
+  min-height: 44px;
+  padding: 10px 14px;
+  background: rgba(111, 220, 154, 0.08);
+  border-color: rgba(111, 220, 154, 0.35);
+  box-shadow: 0 0 16px rgba(111, 220, 154, 0.12);
+}
+
+.cf-fallback-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6fdc9a;
+  font-weight: 500;
+  animation: sl 0.25s ease;
+}
+
+.cf-fallback-msg svg {
+  flex-shrink: 0;
+  color: #6fdc9a;
+}
+
 /* Cloudflare Turnstile Mock */
 .cf {
   display: flex;
@@ -1564,34 +1613,7 @@ dialog::backdrop {
   border-radius: 10px;
 }
 
-/* --------------------------------------------------------------------------
-   20. Responsive Media Queries
-   -------------------------------------------------------------------------- */
 
-@media (max-width: 820px) {
-  .links {
-    display: none;
-  }
-
-  .g2,
-  .g3,
-  .split,
-  .stats {
-    grid-template-columns: 1fr;
-  }
-
-  section {
-    padding: 60px 0;
-  }
-
-  .hero {
-    padding: 90px 0 70px;
-  }
-
-  .f2 {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* --------------------------------------------------------------------------
    21. User Profile Dialog & Management
@@ -1835,3 +1857,600 @@ dialog::backdrop {
   transform: translateY(2px);
   color: var(--tx);
 }
+
+/* ==========================================================================
+   22. Comprehensive Mobile & Tablet Responsive Design
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .links {
+    display: none !important;
+  }
+
+  .g2,
+  .g3,
+  .split,
+  .stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  section {
+    padding: 64px 0;
+  }
+
+  .hero {
+    padding: 96px 0 64px;
+  }
+
+  .f2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Prevent horizontal layout shifts */
+  html,
+  body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  /* Layout Container */
+  .wrap {
+    width: calc(100% - 24px) !important;
+  }
+
+  /* Header Navigation */
+  .nav {
+    padding: 10px 0 !important;
+  }
+
+  .nav .wrap {
+    gap: 8px !important;
+  }
+
+  .logo {
+    gap: 8px !important;
+    font-size: 18px !important;
+  }
+
+  .logo-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  #authSlot {
+    gap: 6px !important;
+  }
+
+  .nav-auth-btn {
+    padding: 7px 12px !important;
+    font-size: 12.5px !important;
+    gap: 6px !important;
+  }
+
+  #authSlot .chip {
+    padding: 3px 10px 3px 3px !important;
+    font-size: 12.5px !important;
+  }
+
+  #authSlot .chip span {
+    max-width: 85px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  #authSlot .chip b {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 56px 0 38px !important;
+    overflow: hidden !important;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.85rem, 8.2vw, 2.45rem) !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.04em !important;
+    max-width: 100% !important;
+    margin-bottom: 16px !important;
+  }
+
+  .hero .lead {
+    font-size: 13.5px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .hero p.sub {
+    font-size: 14.5px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 24px !important;
+    max-width: 100% !important;
+  }
+
+  .hero .row {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .hero .row .btn {
+    width: 100% !important;
+    padding: 13px 20px !important;
+    font-size: 15px !important;
+    justify-content: center !important;
+    text-align: center !important;
+    display: flex !important;
+  }
+
+  /* General Typography & Sections */
+  section {
+    padding: 44px 0 !important;
+  }
+
+  h2 {
+    font-size: 1.65rem !important;
+    margin-bottom: 20px !important;
+    letter-spacing: -0.03em !important;
+  }
+
+  .lead {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Cards & Stats */
+  .card {
+    padding: 20px 16px !important;
+    border-radius: 18px !important;
+  }
+
+  .stats {
+    gap: 10px !important;
+    margin-top: 12px !important;
+  }
+
+  .stats div {
+    padding: 16px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .stats b {
+    font-size: 1.05rem !important;
+  }
+
+  .stats span {
+    font-size: 13px !important;
+  }
+
+  /* Pricing Plans */
+  .plan {
+    padding: 22px 18px !important;
+    border-radius: 18px !important;
+  }
+
+  .tag {
+    top: 14px !important;
+    right: 14px !important;
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+  }
+
+  .price {
+    font-size: 1.5rem !important;
+    margin: 4px 0 14px !important;
+  }
+
+  .plan ul {
+    margin: 0 0 18px !important;
+    gap: 8px !important;
+    font-size: 14px !important;
+  }
+
+  .plan .btn {
+    width: 100% !important;
+    padding: 12px 18px !important;
+    font-size: 14.5px !important;
+    justify-content: center !important;
+  }
+
+  /* Portfolio Works */
+  .th {
+    height: 170px !important;
+    border-radius: 12px !important;
+  }
+
+  .work {
+    padding: 18px 16px !important;
+    border-radius: 18px !important;
+  }
+
+  /* Order Form */
+  .split {
+    gap: 24px !important;
+  }
+
+  .steps {
+    gap: 14px !important;
+    margin-top: 4px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .steps li {
+    gap: 12px !important;
+    font-size: 14px !important;
+  }
+
+  .steps li::before {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 13px !important;
+  }
+
+  .own {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .ownf {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .ownf input[type="number"] {
+    width: 100% !important;
+  }
+
+  label {
+    font-size: 13.5px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Form inputs: 16px prevents iOS Safari from auto-zooming */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  #orderForm .btn {
+    width: 100% !important;
+    padding: 14px 20px !important;
+    font-size: 15px !important;
+    justify-content: center !important;
+  }
+
+  /* FAQ Accordion */
+  details {
+    padding: 0 16px !important;
+    border-radius: 16px !important;
+    margin-bottom: 10px !important;
+  }
+
+  summary {
+    padding: 16px 0 !important;
+    font-size: 0.98rem !important;
+  }
+
+  summary::after {
+    width: 28px !important;
+    height: 28px !important;
+    background-size: 12px 12px !important;
+  }
+
+  details p {
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+    margin: 0 0 16px !important;
+  }
+
+  /* Footer */
+  footer {
+    padding: 28px 0 calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  footer .wrap {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  footer nav {
+    justify-content: center !important;
+    gap: 12px !important;
+    font-size: 13px !important;
+  }
+
+  .footer-brand {
+    justify-content: center !important;
+  }
+
+  /* Dialogs & Modals Universal Responsive */
+  dialog {
+    width: calc(100vw - 20px) !important;
+    max-width: 440px !important;
+    max-height: calc(100dvh - 24px) !important;
+    padding: 22px 16px !important;
+    border-radius: 20px !important;
+    margin: auto !important;
+  }
+
+  .dialog-brand-head h3 {
+    font-size: 1.15rem !important;
+  }
+
+  .tabs {
+    margin: 6px 0 16px !important;
+  }
+
+  .tabs button {
+    padding: 9px 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* Profile Dialog */
+  .profile-dialog {
+    width: calc(100vw - 20px) !important;
+    max-width: 460px !important;
+    padding: 22px 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .profile-header {
+    gap: 12px !important;
+    margin-bottom: 14px !important;
+    padding-bottom: 14px !important;
+  }
+
+  .profile-avatar {
+    width: 52px !important;
+    height: 52px !important;
+    font-size: 22px !important;
+  }
+
+  .profile-title-row {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    align-items: center !important;
+  }
+
+  .profile-title-row h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .badge-role {
+    font-size: 11px !important;
+    padding: 3px 9px !important;
+  }
+
+  .profile-meta {
+    font-size: 12px !important;
+    word-break: break-all !important;
+  }
+
+  /* 2-column mobile stats grid */
+  .profile-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .pstat-card {
+    padding: 10px 8px !important;
+  }
+
+  .pstat-val {
+    font-size: 14px !important;
+  }
+
+  .pstat-lbl {
+    font-size: 11px !important;
+  }
+
+  .admin-quick-btn {
+    font-size: 13px !important;
+    padding: 10px 14px !important;
+  }
+
+  .profile-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+    margin-top: 18px !important;
+    padding-top: 14px !important;
+  }
+
+  .profile-actions .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Admin Modal */
+  #adm {
+    width: calc(100vw - 16px) !important;
+    max-width: 680px !important;
+    max-height: calc(100dvh - 20px) !important;
+    border-radius: 20px !important;
+  }
+
+  #admTabs {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+    padding: 10px 14px 8px !important;
+    gap: 6px !important;
+  }
+
+  #admTabs button {
+    flex: 0 0 auto !important;
+    padding: 7px 14px !important;
+    font-size: 13px !important;
+  }
+
+  #admBody {
+    padding: 14px !important;
+  }
+
+  .kp {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .kp div {
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .kp b {
+    font-size: 1.3rem !important;
+  }
+
+  .ar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .ar select,
+  .ar input,
+  .ar .btn {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  /* Orders Modal */
+  #orders {
+    width: calc(100vw - 20px) !important;
+    max-width: 480px !important;
+    padding: 22px 16px !important;
+  }
+
+  .ord {
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
+    font-size: 13.5px !important;
+  }
+
+  /* Legal Dialogs */
+  .legal-dialog {
+    width: calc(100vw - 20px) !important;
+    padding: 22px 16px !important;
+    border-radius: 20px !important;
+  }
+
+  .legal-dialog .legal-content {
+    font-size: 13.5px !important;
+  }
+
+  /* Support Chat Widget on Mobile */
+  #chatBtn {
+    right: 14px !important;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  #chat {
+    width: calc(100vw - 20px) !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    height: min(480px, calc(100dvh - 90px)) !important;
+    border-radius: 18px !important;
+  }
+
+  #msgs {
+    padding: 12px !important;
+    gap: 8px !important;
+  }
+
+  .qs {
+    padding: 6px 12px !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .qs button {
+    flex: 0 0 auto !important;
+    font-size: 12px !important;
+    padding: 5px 10px !important;
+  }
+
+  #cf2 {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+
+  #cIn {
+    font-size: 16px !important;
+    padding: 9px 12px !important;
+  }
+
+  /* Cookie Banner on Mobile */
+  .cookie-banner {
+    width: calc(100vw - 20px) !important;
+    left: 10px !important;
+    right: 10px !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    padding: 14px 16px !important;
+    border-radius: 16px !important;
+    gap: 10px !important;
+  }
+
+  .cookie-banner-text {
+    font-size: 12.5px !important;
+  }
+
+  .cookie-banner-actions {
+    width: 100% !important;
+  }
+
+  .cookie-banner-actions .btn {
+    flex: 1 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding: 9px 14px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  #myOrd span {
+    display: none !important;
+  }
+
+  #myOrd {
+    padding: 7px 10px !important;
+  }
+
+  #inBtn span {
+    font-size: 12px !important;
+  }
+
+  #authSlot .chip span {
+    max-width: 65px !important;
+    font-size: 11.5px !important;
+  }
+
+  #authSlot .chip b {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 11px !important;
+  }
+
+  .logo span {
+    font-size: 16px !important;
+  }
+}
+
