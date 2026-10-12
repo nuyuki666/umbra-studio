@@ -39,11 +39,26 @@
       <nav class="links">
         <a href="#advantages">Преимущества</a>
         <a href="#plans">Тарифы</a>
+        <a href="#configurator">Конструктор</a>
         <a href="#works">Работы</a>
         <a href="#order">Заказ</a>
         <a href="#faq">FAQ</a>
       </nav>
       <div id="authSlot">
+        <!-- Sound FX toggle button -->
+        <button class="nav-icon-btn" id="soundToggleBtn" type="button" title="Звуковые 3D эффекты" aria-label="Включить/выключить звук">
+          <svg class="sound-on-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          <svg class="sound-off-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+        </button>
+
+        <!-- Cyber Accent Theme Switcher -->
+        <div class="theme-picker" title="Выбрать цвет интерфейса">
+          <button type="button" class="theme-dot dot-purple on" data-theme="purple" aria-label="Фиолетовый"></button>
+          <button type="button" class="theme-dot dot-green" data-theme="green" aria-label="Зеленый"></button>
+          <button type="button" class="theme-dot dot-blue" data-theme="blue" aria-label="Синий"></button>
+          <button type="button" class="theme-dot dot-gold" data-theme="gold" aria-label="Золотой"></button>
+        </div>
+
         <button class="nav-auth-btn" id="inBtn" aria-label="Войти в личный кабинет">
           <svg class="nav-auth-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
@@ -59,13 +74,76 @@
   <main id="top">
     <!-- Hero Section -->
     <section class="hero">
-      <div class="wrap">
-        <p class="lead"><span class="beacon"></span>Мы только открываемся. Делаем <span id="typed"></span><i class="cur"></i></p>
-        <h1>Дизайн сайта, который приводит клиентов</h1>
-        <p class="sub">Разрабатываем интерфейсы для бизнеса: от лендинга до интернет-магазина. Вы оставляете заявку, мы уточняем задачу и называем цену.</p>
-        <div class="row">
-          <a class="btn big" href="#order">Заказать дизайн</a>
-          <a class="btn big ghost" href="#plans">Смотреть тарифы</a>
+      <div class="wrap hero-wrap">
+        <div class="hero-left">
+          <p class="lead"><span class="beacon"></span>Мы только открываемся. Делаем <span id="typed"></span><i class="cur"></i></p>
+          <h1>Дизайн сайта, который приводит клиентов</h1>
+          <p class="sub">Разрабатываем интерфейсы для бизнеса: от лендинга до интернет-магазина. Вы оставляете заявку, мы уточняем задачу и называем цену.</p>
+          <div class="row">
+            <a class="btn big" href="#configurator">
+              <span>Собрать в конструкторе</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <a class="btn big ghost" href="#plans">Тарифы</a>
+          </div>
+        </div>
+
+        <!-- Interactive 3D Cyber Device Mockup -->
+        <div class="hero-right">
+          <div class="mockup-card tilt-3d" id="heroMockup">
+            <div class="mockup-header">
+              <div class="mockup-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="mockup-tab-pill">
+                <button type="button" class="mtab on" data-mtab="speed">⚡ 100/100</button>
+                <button type="button" class="mtab" data-mtab="responsive">📱 3D Адаптив</button>
+                <button type="button" class="mtab" data-mtab="code">💻 WebGL</button>
+              </div>
+            </div>
+            <div class="mockup-body" id="mockupBody">
+              <div class="mbody-view mview-speed on">
+                <div class="mmetric-ring">
+                  <div class="mmetric-val">100</div>
+                  <div class="mmetric-lbl">PageSpeed</div>
+                </div>
+                <div class="mmetric-items">
+                  <div class="mmetric-row"><span>Performance</span><b>100%</b></div>
+                  <div class="mmetric-row"><span>Accessibility</span><b>100%</b></div>
+                  <div class="mmetric-row"><span>Best Practices</span><b>100%</b></div>
+                  <div class="mmetric-row"><span>SEO Score</span><b>100%</b></div>
+                </div>
+              </div>
+              <div class="mbody-view mview-responsive">
+                <div class="mphone-frame">
+                  <div class="mphone-screen">
+                    <div class="mphone-notch"></div>
+                    <div class="mwire-card"></div>
+                    <div class="mwire-btn"></div>
+                  </div>
+                </div>
+                <div class="mresponsive-text">
+                  <strong>Pixel-perfect Fluid</strong>
+                  <span>Адаптация под все iPhone, Android, планшеты и 4K экраны</span>
+                </div>
+              </div>
+              <div class="mbody-view mview-code">
+                <pre class="mcode-block"><code><span class="ckw">const</span> studio = <span class="cfn">new</span> <span class="ccls">UmbraEngine</span>({
+  turnstile: <span class="cbl">true</span>,
+  db: <span class="cstr">'PostgreSQL'</span>,
+  motion: <span class="cstr">'3D Hardware'</span>,
+  speed: <span class="cnum">100</span>
+});
+studio.<span class="cfn">launch</span>();</code></pre>
+              </div>
+            </div>
+            <div class="mockup-footer">
+              <span class="mockup-status-dot"></span>
+              <span>Интерактивная 3D модель · наведите курсор</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -155,6 +233,157 @@
               <li>Срок от 21 дня</li>
             </ul>
             <button class="btn ghost" data-plan="Интернет-магазин">Заказать</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive 3D Project Configurator Section -->
+    <section id="configurator" class="config-section">
+      <div class="wrap">
+        <div class="config-header">
+          <p class="lead"><span class="beacon"></span>Интерактивный расчёт сметы</p>
+          <h2>3D Конструктор сайта</h2>
+          <p class="sub">Соберите сайт под вашу задачу: выберите тип, стиль, модули и получите точную смету с переносом в бриф за 1 клик.</p>
+        </div>
+
+        <div class="config-grid">
+          <!-- Left side: Interactive options builder -->
+          <div class="config-controls">
+            <!-- 1. Type of Project -->
+            <div class="config-group">
+              <label class="config-title">1. Тип проекта</label>
+              <div class="btn-3d-grid" id="cfgTypeGroup">
+                <button type="button" class="btn-3d on" data-type="landing">
+                  <span class="btn-3d-icon">⚡</span>
+                  <span class="btn-3d-title">Лендинг</span>
+                  <span class="btn-3d-desc">от 18 900 ₽ · от 5 дней</span>
+                </button>
+                <button type="button" class="btn-3d" data-type="corporate">
+                  <span class="btn-3d-icon">🏢</span>
+                  <span class="btn-3d-title">Корпоративный</span>
+                  <span class="btn-3d-desc">от 39 000 ₽ · от 14 дней</span>
+                </button>
+                <button type="button" class="btn-3d" data-type="shop">
+                  <span class="btn-3d-icon">🛒</span>
+                  <span class="btn-3d-title">Интернет-магазин</span>
+                  <span class="btn-3d-desc">от 69 000 ₽ · от 21 дня</span>
+                </button>
+                <button type="button" class="btn-3d" data-type="webapp">
+                  <span class="btn-3d-icon">📱</span>
+                  <span class="btn-3d-title">Web-сервис / App</span>
+                  <span class="btn-3d-desc">от 55 000 ₽ · от 18 дней</span>
+                </button>
+                <button type="button" class="btn-3d" data-type="redesign">
+                  <span class="btn-3d-icon">✨</span>
+                  <span class="btn-3d-title">Редизайн сайта</span>
+                  <span class="btn-3d-desc">от 25 000 ₽ · от 7 дней</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Visual Style -->
+            <div class="config-group">
+              <label class="config-title">2. Визуальная эстетика</label>
+              <div class="btn-3d-grid mini" id="cfgStyleGroup">
+                <button type="button" class="btn-3d on" data-style="cyber">🌌 Dark Cyber & Glass</button>
+                <button type="button" class="btn-3d" data-style="minimal">⚪ Clean Minimalism</button>
+                <button type="button" class="btn-3d" data-style="editorial">🎨 Bold Editorial</button>
+                <button type="button" class="btn-3d" data-style="luxury">💎 High-Tech Luxury</button>
+              </div>
+            </div>
+
+            <!-- 3. Add-on Modules (Multi-select) -->
+            <div class="config-group">
+              <label class="config-title">3. Интерактивные модули (мультивыбор)</label>
+              <div class="btn-3d-grid" id="cfgModulesGroup">
+                <button type="button" class="btn-3d toggle-3d on" data-mod="anim">
+                  <span class="tgl-check">✓</span>
+                  <span class="tgl-text">3D-анимации и WebGL (+6 000 ₽)</span>
+                </button>
+                <button type="button" class="btn-3d toggle-3d on" data-mod="bot">
+                  <span class="tgl-check">✓</span>
+                  <span class="tgl-text">Онлайн-чат + Telegram-бот (+8 000 ₽)</span>
+                </button>
+                <button type="button" class="btn-3d toggle-3d" data-mod="pay">
+                  <span class="tgl-check">✓</span>
+                  <span class="tgl-text">Эквайринг и платёжный шлюз (+7 000 ₽)</span>
+                </button>
+                <button type="button" class="btn-3d toggle-3d on" data-mod="sec">
+                  <span class="tgl-check">✓</span>
+                  <span class="tgl-text">Turnstile защита от ботов (+4 000 ₽)</span>
+                </button>
+                <button type="button" class="btn-3d toggle-3d" data-mod="cms">
+                  <span class="tgl-check">✓</span>
+                  <span class="tgl-text">Панель управления (CMS / Админка) (+12 000 ₽)</span>
+                </button>
+                <button type="button" class="btn-3d toggle-3d on" data-mod="speed">
+                  <span class="tgl-check">✓</span>
+                  <span class="tgl-text">Турбо-скорость 100/100 PageSpeed (+5 000 ₽)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 4. Delivery Sprint -->
+            <div class="config-group">
+              <label class="config-title">4. Темп реализации</label>
+              <div class="btn-3d-grid mini" id="cfgSpeedGroup">
+                <button type="button" class="btn-3d on" data-speed="std">Стандартный срок</button>
+                <button type="button" class="btn-3d" data-speed="fast">Приоритет (-30% времени)</button>
+                <button type="button" class="btn-3d" data-speed="turbo">🔥 Turbo-спринт (до 72 ч)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: Live 3D Holographic Summary Card -->
+          <div class="config-summary-wrap">
+            <div class="card config-summary-card tilt-3d" id="configCard">
+              <div class="cfg-badge-row">
+                <span class="cfg-live-badge"><span class="beacon"></span>Live Смета</span>
+                <span class="cfg-id-badge" id="cfgCode">CFG-9402</span>
+              </div>
+
+              <div class="cfg-mockup-screen">
+                <div class="cfg-screen-head">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                  <span class="cfg-screen-url" id="cfgPreviewUrl">umbra.studio/config</span>
+                </div>
+                <div class="cfg-screen-body">
+                  <div class="cfg-wire-hero">
+                    <span class="cfg-wire-line long"></span>
+                    <span class="cfg-wire-line short"></span>
+                    <div class="cfg-wire-tags" id="cfgWireTags">
+                      <span>⚡ Лендинг</span>
+                      <span>🌌 Cyber</span>
+                      <span>3D Motion</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cfg-price-box">
+                <div class="cfg-price-lbl">Расчётная стоимость</div>
+                <div class="cfg-price-val"><span id="cfgPriceNum">33 900</span> <small>₽</small></div>
+                <div class="cfg-meta-row">
+                  <div class="cfg-meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span id="cfgDays">Срок: ~7-9 раб. дней</span>
+                  </div>
+                  <div class="cfg-meta-item">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span>Фиксация по договору</span>
+                  </div>
+                </div>
+              </div>
+
+              <button type="button" class="btn big btn-3d-cta" id="cfgApplyBtn">
+                <span>Перенести в заявку</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+              <p class="note" style="margin-top:10px">Автоматически заполнит форму заказа внизу страницы</p>
+            </div>
           </div>
         </div>
       </div>
@@ -709,6 +938,7 @@
   <script src="js/orders.js" defer></script>
   <script src="js/chat.js" defer></script>
   <script src="js/admin.js" defer></script>
+  <script src="js/configurator.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
 </html>

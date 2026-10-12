@@ -153,7 +153,7 @@ function observeReveal() {
  * Active Navigation Link Tracker
  */
 function initNavObserver() {
-  const sections = ['advantages', 'plans', 'works', 'order', 'faq'];
+  const sections = ['advantages', 'plans', 'configurator', 'works', 'order', 'faq'];
   const links = $$('.links a');
 
   const navObserver = new IntersectionObserver(
@@ -184,4 +184,226 @@ function initMarquee() {
   if (marqueeInner) {
     marqueeInner.innerHTML += marqueeInner.innerHTML;
   }
+}
+
+/**
+ * 3D Card Tilt & Holographic Glare Tracking
+ */
+function init3DTilt() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const tiltCards = document.querySelectorAll('.tilt-3d, .card, .plan, .config-summary-card, .btn-3d');
+
+  tiltCards.forEach(card => {
+    let ticking = false;
+
+    card.addEventListener('pointermove', e => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const dx = (x - rect.width / 2) / (rect.width / 2);
+        const dy = (y - rect.height / 2) / (rect.height / 2);
+
+        const rotX = -dy * 6;
+        const rotY = dx * 6;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(4px)`;
+        card.style.setProperty('--mx', `${x}px`);
+        card.style.setProperty('--my', `${y}px`);
+        ticking = false;
+      });
+    });
+
+    card.addEventListener('pointerleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';
+      card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+      setTimeout(() => {
+        card.style.transition = '';
+      }, 400);
+    });
+  });
+}
+
+/**
+ * 3D Interactive Hero Mockup View Switcher
+ */
+function initHeroMockupTabs() {
+  const mtabs = document.querySelectorAll('.mtab');
+  const views = document.querySelectorAll('.mbody-view');
+  if (!mtabs.length) return;
+
+  mtabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      mtabs.forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      const targetView = btn.dataset.mtab;
+
+      views.forEach(v => {
+        v.classList.toggle('on', v.classList.contains(`mview-${targetView}`));
+      });
+
+      if (window.cyberAudio) window.cyberAudio.playClick();
+    });
+  });
+}
+
+/**
+ * Cyber Click Burst Sparks
+ */
+function initClickParticles() {
+  document.addEventListener('click', e => {
+    const target = e.target.closest('button, .btn, .btn-3d, .chip, [data-plan], .theme-dot, a.btn');
+    if (!target) return;
+
+    if (window.cyberAudio && !target.closest('#soundToggleBtn')) {
+      window.cyberAudio.playClick();
+    }
+
+    const count = 7;
+    const colors = ['var(--ac)', 'var(--ac2)', '#52f89a', '#54e0ff', '#ffd700'];
+
+    for (let i = 0; i < count; i++) {
+      const spark = document.createElement('span');
+      spark.className = 'cyber-spark';
+      const angle = (i / count) * 2 * Math.PI + (Math.random() - 0.5) * 0.4;
+      const dist = 30 + Math.random() * 24;
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+      const size = 3 + Math.random() * 3;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      spark.style.cssText = `
+        left: ${e.clientX}px;
+        top: ${e.clientY}px;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${color};
+        box-shadow: 0 0 8px ${color};
+        --tx: ${tx}px;
+        --ty: ${ty}px;
+      `;
+      document.body.appendChild(spark);
+      setTimeout(() => spark.remove(), 420);
+    }
+  });
+}
+
+/**
+ * Theme Accent Switcher
+ */
+const THEMES = {
+  purple: { ac: '#a9a5ff', ac2: '#7570e6', shadow: '#5550be' },
+  green: { ac: '#52f89a', ac2: '#1ab862', shadow: '#128243' },
+  blue: { ac: '#54e0ff', ac2: '#1fa2d6', shadow: '#147299' },
+  gold: { ac: '#ffd700', ac2: '#ff9900', shadow: '#b36b00' }
+};
+
+function applyTheme(name) {
+  const theme = THEMES[name] || THEMES.purple;
+  const root = document.documentElement;
+  root.style.setProperty('--ac', theme.ac);
+  root.style.setProperty('--ac2', theme.ac2);
+  root.style.setProperty('--btn-shadow', theme.shadow);
+
+  document.querySelectorAll('.theme-dot').forEach(dot => {
+    dot.classList.toggle('on', dot.dataset.theme === name);
+  });
+  db.set('u_theme', name);
+}
+
+function initThemeSwitcher() {
+  const savedTheme = db.get('u_theme', 'purple');
+  applyTheme(savedTheme);
+
+  document.addEventListener('click', e => {
+    const dot = e.target.closest('.theme-dot');
+    if (!dot || !dot.dataset.theme) return;
+    applyTheme(dot.dataset.theme);
+    if (window.cyberAudio) window.cyberAudio.playSuccess();
+  });
+}
+
+/**
+ * Cyber Web Audio Synthesizer (Native Web Audio API)
+ */
+const cyberAudio = {
+  enabled: db.get('u_sound', true),
+  ctx: null,
+  init() {
+    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  },
+  playClick() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1300, this.ctx.currentTime + 0.032);
+      gain.gain.setValueAtTime(0.045, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.032);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.033);
+    } catch (e) {}
+  },
+  playSuccess() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.5];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        const start = this.ctx.currentTime + idx * 0.055;
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.04, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.16);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(start);
+        osc.stop(start + 0.17);
+      });
+    } catch (e) {}
+  }
+};
+window.cyberAudio = cyberAudio;
+
+function initSoundToggle() {
+  const btn = document.getElementById('soundToggleBtn');
+  if (!btn) return;
+
+  const updateSoundUI = () => {
+    const onIcon = btn.querySelector('.sound-on-icon');
+    const offIcon = btn.querySelector('.sound-off-icon');
+    if (onIcon) onIcon.style.display = cyberAudio.enabled ? 'block' : 'none';
+    if (offIcon) offIcon.style.display = cyberAudio.enabled ? 'none' : 'block';
+    btn.classList.toggle('muted', !cyberAudio.enabled);
+  };
+
+  updateSoundUI();
+
+  btn.addEventListener('click', () => {
+    cyberAudio.enabled = !cyberAudio.enabled;
+    db.set('u_sound', cyberAudio.enabled);
+    updateSoundUI();
+    if (cyberAudio.enabled) cyberAudio.playClick();
+    if (typeof toast === 'function') {
+      toast(cyberAudio.enabled ? 'Звуковые 3D эффекты включены' : 'Звук выключен');
+    }
+  });
 }

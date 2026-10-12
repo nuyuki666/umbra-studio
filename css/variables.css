@@ -2,8 +2,9 @@
    Design Tokens & CSS Variables
    ========================================================================== */
 
-:root {
-  /* Color Palette */
+:root,
+body[data-theme="purple"] {
+  /* Color Palette - Default Cyber Purple */
   --bg: #0b0b0e;
   --s: rgba(255, 255, 255, 0.045);
   --s2: rgba(255, 255, 255, 0.08);
@@ -12,6 +13,8 @@
   --mu: #a8a8b8;
   --ac: #a9a5ff;
   --ac2: #7570e6;
+  --ac-glow: rgba(169, 165, 255, 0.28);
+  --ac-subtle: rgba(169, 165, 255, 0.08);
   --ok: #6fdc9a;
   --er: #ff7a8a;
 
@@ -21,3 +24,25 @@
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+
+body[data-theme="green"] {
+  --ac: #52e5a4;
+  --ac2: #24b875;
+  --ac-glow: rgba(82, 229, 164, 0.28);
+  --ac-subtle: rgba(82, 229, 164, 0.08);
+}
+
+body[data-theme="blue"] {
+  --ac: #52b6ff;
+  --ac2: #1e87e6;
+  --ac-glow: rgba(82, 182, 255, 0.28);
+  --ac-subtle: rgba(82, 182, 255, 0.08);
+}
+
+body[data-theme="gold"] {
+  --ac: #ffc252;
+  --ac2: #d99616;
+  --ac-glow: rgba(255, 194, 82, 0.28);
+  --ac-subtle: rgba(255, 194, 82, 0.08);
+}
+

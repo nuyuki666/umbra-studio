@@ -111,15 +111,21 @@ document.addEventListener('DOMContentLoaded', () => {
     db.set('u_session', null);
   }
 
-  // Visuals and animations
+  // Visuals, 3D and sound effects
   initStars();
   initTypewriter();
   initParallaxAndScroll();
   initMarquee();
+  init3DTilt();
+  initHeroMockupTabs();
+  initClickParticles();
+  initThemeSwitcher();
+  initSoundToggle();
 
   // Content & dynamic data
   paintStudio();
   renderWorks();
+  if (typeof initConfigurator === 'function') initConfigurator();
   initScrollReveal();
   initNavObserver();
 

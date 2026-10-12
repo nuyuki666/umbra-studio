@@ -343,9 +343,45 @@ details[open] p {
   animation: fl 1.3s;
 }
 
+/* Cyber Spark Click Burst Particles */
+@keyframes sparkBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 0px), var(--ty, -30px)) scale(0);
+  }
+}
+
+.cyber-spark {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  z-index: 9999;
+  animation: sparkBurst 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* 3D Float subtle hovering */
+@keyframes float3D {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotateX(1.5deg);
+  }
+}
+
+.floating-3d {
+  animation: float3D 6s ease-in-out infinite;
+}
+
 /* --------------------------------------------------------------------------
    Accessibility & Reduced Motion Preferences
    -------------------------------------------------------------------------- */
+
 
 @media (prefers-reduced-motion: reduce) {
   .neb {
