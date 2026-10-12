@@ -322,10 +322,10 @@ function openProfile(initialTab = 'info') {
   const roleBadge = $('#profRoleBadge');
   if (roleBadge) {
     if (isAdminUser) {
-      roleBadge.textContent = '👑 Администратор';
+      roleBadge.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg> <span>Администратор</span>';
       roleBadge.className = 'badge-role role-admin';
     } else {
-      roleBadge.textContent = '⭐️ Клиент';
+      roleBadge.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <span>Клиент</span>';
       roleBadge.className = 'badge-role role-user';
     }
   }

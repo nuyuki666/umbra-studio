@@ -192,10 +192,14 @@ function initMarquee() {
 function init3DTilt() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  const tiltCards = document.querySelectorAll('.tilt-3d, .card, .plan, .config-summary-card, .btn-3d');
+  const tiltCards = document.querySelectorAll('.tilt-3d, .plan');
 
   tiltCards.forEach(card => {
     let ticking = false;
+
+    card.addEventListener('pointerenter', () => {
+      card.style.transition = 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
+    });
 
     card.addEventListener('pointermove', e => {
       if (ticking) return;
@@ -208,10 +212,10 @@ function init3DTilt() {
         const dx = (x - rect.width / 2) / (rect.width / 2);
         const dy = (y - rect.height / 2) / (rect.height / 2);
 
-        const rotX = -dy * 6;
-        const rotY = dx * 6;
+        const rotX = -dy * 5;
+        const rotY = dx * 5;
 
-        card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(4px)`;
+        card.style.transform = `perspective(1000px) rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) translateZ(3px)`;
         card.style.setProperty('--mx', `${x}px`);
         card.style.setProperty('--my', `${y}px`);
         ticking = false;
@@ -219,11 +223,11 @@ function init3DTilt() {
     });
 
     card.addEventListener('pointerleave', () => {
+      card.style.transition = 'transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)';
       card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';
-      card.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
       setTimeout(() => {
         card.style.transition = '';
-      }, 400);
+      }, 550);
     });
   });
 }

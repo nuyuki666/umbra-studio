@@ -4,30 +4,30 @@
 
 const CONFIG_DATA = {
   types: {
-    landing: { name: 'Лендинг', price: 18900, days: 5, tag: '⚡ Лендинг' },
-    corporate: { name: 'Корпоративный сайт', price: 39000, days: 14, tag: '🏢 Корпоративный' },
-    shop: { name: 'Интернет-магазин', price: 69000, days: 21, tag: '🛒 Интернет-магазин' },
-    webapp: { name: 'Web-сервис / App', price: 55000, days: 18, tag: '📱 WebApp / Сервис' },
-    redesign: { name: 'Редизайн сайта', price: 25000, days: 7, tag: '✨ Редизайн' }
+    landing: { name: 'Лендинг', price: 1490, days: 3, tag: 'Лендинг' },
+    corporate: { name: 'Корпоративный сайт', price: 2990, days: 7, tag: 'Корпоративный' },
+    shop: { name: 'Интернет-магазин', price: 4990, days: 10, tag: 'Интернет-магазин' },
+    webapp: { name: 'Web-сервис / App', price: 3990, days: 8, tag: 'WebApp / Сервис' },
+    redesign: { name: 'Редизайн сайта', price: 990, days: 2, tag: 'Редизайн' }
   },
   styles: {
-    cyber: { name: 'Dark Cyber & Glass', tag: '🌌 Cyber' },
-    minimal: { name: 'Clean Minimalism', tag: '⚪ Minimal' },
-    editorial: { name: 'Bold Editorial', tag: '🎨 Editorial' },
-    luxury: { name: 'High-Tech Luxury', tag: '💎 Luxury' }
+    cyber: { name: 'Dark Cyber & Glass', tag: 'Dark Cyber' },
+    minimal: { name: 'Clean Minimalism', tag: 'Minimalism' },
+    editorial: { name: 'Bold Editorial', tag: 'Editorial' },
+    luxury: { name: 'High-Tech Luxury', tag: 'Luxury' }
   },
   modules: {
-    anim: { name: '3D-анимации и WebGL', price: 6000, days: 2, tag: '3D WebGL' },
-    bot: { name: 'Онлайн-чат + Telegram-бот', price: 8000, days: 2, tag: 'Чат + TG' },
-    pay: { name: 'Эквайринг и онлайн-оплата', price: 7000, days: 1, tag: 'Оплата' },
-    sec: { name: 'Turnstile защита от спама', price: 4000, days: 0, tag: 'Turnstile' },
-    cms: { name: 'Панель управления (CMS / Админка)', price: 12000, days: 3, tag: 'CMS' },
-    speed: { name: 'Турбо-скорость 100/100', price: 5000, days: 1, tag: 'Скорость 100' }
+    anim: { name: '3D-анимации и WebGL', price: 350, days: 1, tag: '3D WebGL' },
+    bot: { name: 'Онлайн-чат + Telegram-бот', price: 450, days: 1, tag: 'Чат + TG' },
+    pay: { name: 'Эквайринг и платёжный шлюз', price: 400, days: 1, tag: 'Оплата' },
+    sec: { name: 'Turnstile защита от спама', price: 200, days: 0, tag: 'Turnstile' },
+    cms: { name: 'Панель управления (CMS / Админка)', price: 550, days: 2, tag: 'CMS' },
+    speed: { name: 'Турбо-скорость 100/100', price: 250, days: 0, tag: 'Скорость 100' }
   },
   speeds: {
-    std: { name: 'Стандартный', mult: 1, dmult: 1 },
-    fast: { name: 'Приоритет (-30% времени)', mult: 1.2, dmult: 0.7 },
-    turbo: { name: 'Turbo-спринт (до 72 ч)', mult: 1.45, dmult: 0.4 }
+    std: { name: 'Стандартный срок', mult: 1, dmult: 1 },
+    fast: { name: 'Приоритет (-30% времени)', mult: 1.15, dmult: 0.7 },
+    turbo: { name: 'Turbo-спринт (до 72 ч)', mult: 1.3, dmult: 0.5 }
   }
 };
 
@@ -36,36 +36,41 @@ let activeConfig = {
   style: 'cyber',
   modules: ['anim', 'bot', 'sec', 'speed'],
   speed: 'std',
-  totalPrice: 33900,
-  totalDays: 7
+  totalPrice: 2740,
+  totalDays: 4
 };
 
-let currentAnimatedPrice = 33900;
+let currentAnimatedPrice = 2740;
 let priceAnimTimer = null;
 
 function animatePriceDisplay(targetVal) {
   const priceNumEl = document.getElementById('cfgPriceNum');
   if (!priceNumEl) return;
 
-  clearInterval(priceAnimTimer);
+  if (priceAnimTimer) cancelAnimationFrame(priceAnimTimer);
   const startVal = currentAnimatedPrice;
   const diff = targetVal - startVal;
-  const duration = 280;
+  const duration = 320;
   const startTime = performance.now();
 
-  priceAnimTimer = setInterval(() => {
-    const elapsed = performance.now() - startTime;
+  function step(now) {
+    const elapsed = now - startTime;
     const progress = Math.min(1, elapsed / duration);
-    const ease = 1 - Math.pow(1 - progress, 3);
+    // Smooth quartic ease-out
+    const ease = 1 - Math.pow(1 - progress, 4);
     const current = Math.round(startVal + diff * ease);
 
     priceNumEl.textContent = new Intl.NumberFormat('ru-RU').format(current);
 
-    if (progress >= 1) {
-      clearInterval(priceAnimTimer);
+    if (progress < 1) {
+      priceAnimTimer = requestAnimationFrame(step);
+    } else {
       currentAnimatedPrice = targetVal;
+      priceAnimTimer = null;
     }
-  }, 16);
+  }
+
+  priceAnimTimer = requestAnimationFrame(step);
 }
 
 function calculateConfig() {
@@ -89,8 +94,8 @@ function calculateConfig() {
     }
   });
 
-  const finalPrice = Math.round((basePrice * speedObj.mult) / 100) * 100;
-  const finalDays = Math.max(3, Math.round(baseDays * speedObj.dmult));
+  const finalPrice = Math.round((basePrice * speedObj.mult) / 10) * 10;
+  const finalDays = Math.max(2, Math.round(baseDays * speedObj.dmult));
 
   activeConfig.totalPrice = finalPrice;
   activeConfig.totalDays = finalDays;
@@ -101,7 +106,7 @@ function calculateConfig() {
   // Update days indicator
   const daysEl = document.getElementById('cfgDays');
   if (daysEl) {
-    daysEl.textContent = `Срок: ~${finalDays}-${finalDays + 2} раб. дней (${speedObj.name})`;
+    daysEl.textContent = `Срок: ~${finalDays}-${finalDays + 1} раб. дней (${speedObj.name})`;
   }
 
   // Update wireframe preview tags
@@ -207,7 +212,7 @@ function initConfigurator() {
       if (oType) {
         if (activeConfig.type === 'shop') oType.value = 'Интернет-магазин';
         else if (activeConfig.type === 'corporate') oType.value = 'Многостраничный сайт';
-        else if (activeConfig.type === 'redesign') oType.value = 'Редизайн';
+        else if (activeConfig.type === 'redesign') oType.value = 'Редизайн существующего сайта';
         else oType.value = 'Лендинг';
       }
 
@@ -217,11 +222,25 @@ function initConfigurator() {
       }
 
       const oBud = document.getElementById('oBud');
-      const oRange = document.getElementById('oRange');
-      const bVal = document.getElementById('bVal');
-      if (oBud) oBud.value = activeConfig.totalPrice;
-      if (oRange) oRange.value = Math.min(200000, Math.max(15000, activeConfig.totalPrice));
-      if (bVal) bVal.textContent = new Intl.NumberFormat('ru-RU').format(activeConfig.totalPrice) + ' ₽';
+      const oSum = document.getElementById('oSum');
+      if (oBud) {
+        if (activeConfig.totalPrice <= 1500) {
+          oBud.value = 'до 1 500 ₽';
+          if (oSum) oSum.hidden = true;
+        } else if (activeConfig.totalPrice <= 3000) {
+          oBud.value = '1 500 – 3 000 ₽';
+          if (oSum) oSum.hidden = true;
+        } else if (activeConfig.totalPrice <= 5000) {
+          oBud.value = '3 000 – 5 000 ₽';
+          if (oSum) oSum.hidden = true;
+        } else {
+          oBud.value = 'Своя сумма';
+          if (oSum) {
+            oSum.hidden = false;
+            oSum.value = activeConfig.totalPrice;
+          }
+        }
+      }
 
       // Play sound & smooth scroll
       if (window.cyberAudio) window.cyberAudio.playSuccess();

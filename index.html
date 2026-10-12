@@ -12,7 +12,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap">
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/variables.css">
@@ -98,9 +98,18 @@
                 <span class="dot green"></span>
               </div>
               <div class="mockup-tab-pill">
-                <button type="button" class="mtab on" data-mtab="speed">⚡ 100/100</button>
-                <button type="button" class="mtab" data-mtab="responsive">📱 3D Адаптив</button>
-                <button type="button" class="mtab" data-mtab="code">💻 WebGL</button>
+                <button type="button" class="mtab on" data-mtab="speed">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>100/100</span>
+                </button>
+                <button type="button" class="mtab" data-mtab="responsive">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                  <span>3D Адаптив</span>
+                </button>
+                <button type="button" class="mtab" data-mtab="code">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <span>WebGL</span>
+                </button>
               </div>
             </div>
             <div class="mockup-body" id="mockupBody">
@@ -205,7 +214,7 @@ studio.<span class="cfn">launch</span>();</code></pre>
               <li>До 6 экранов</li>
               <li>Адаптив под телефон</li>
               <li>2 круга правок</li>
-              <li>Срок от 5 дней</li>
+              <li>Срок от 3 дней</li>
             </ul>
             <button class="btn ghost" data-plan="Лендинг">Заказать</button>
           </div>
@@ -218,7 +227,7 @@ studio.<span class="cfn">launch</span>();</code></pre>
               <li>До 12 страниц</li>
               <li>UI-кит и дизайн-система</li>
               <li>Прототип для согласования</li>
-              <li>Срок от 14 дней</li>
+              <li>Срок от 7 дней</li>
             </ul>
             <button class="btn" data-plan="Многостраничный сайт">Заказать</button>
           </div>
@@ -230,7 +239,7 @@ studio.<span class="cfn">launch</span>();</code></pre>
               <li>Каталог, карточка, корзина</li>
               <li>Личный кабинет покупателя</li>
               <li>Анимации и микровзаимодействия</li>
-              <li>Срок от 21 дня</li>
+              <li>Срок от 10 дней</li>
             </ul>
             <button class="btn ghost" data-plan="Интернет-магазин">Заказать</button>
           </div>
@@ -255,29 +264,39 @@ studio.<span class="cfn">launch</span>();</code></pre>
               <label class="config-title">1. Тип проекта</label>
               <div class="btn-3d-grid" id="cfgTypeGroup">
                 <button type="button" class="btn-3d on" data-type="landing">
-                  <span class="btn-3d-icon">⚡</span>
+                  <span class="btn-3d-icon">
+                    <svg class="btn-3d-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </span>
                   <span class="btn-3d-title">Лендинг</span>
-                  <span class="btn-3d-desc">от 18 900 ₽ · от 5 дней</span>
+                  <span class="btn-3d-desc">от 1 490 ₽ · от 3 дней</span>
                 </button>
                 <button type="button" class="btn-3d" data-type="corporate">
-                  <span class="btn-3d-icon">🏢</span>
+                  <span class="btn-3d-icon">
+                    <svg class="btn-3d-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+                  </span>
                   <span class="btn-3d-title">Корпоративный</span>
-                  <span class="btn-3d-desc">от 39 000 ₽ · от 14 дней</span>
+                  <span class="btn-3d-desc">от 2 990 ₽ · от 7 дней</span>
                 </button>
                 <button type="button" class="btn-3d" data-type="shop">
-                  <span class="btn-3d-icon">🛒</span>
+                  <span class="btn-3d-icon">
+                    <svg class="btn-3d-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                  </span>
                   <span class="btn-3d-title">Интернет-магазин</span>
-                  <span class="btn-3d-desc">от 69 000 ₽ · от 21 дня</span>
+                  <span class="btn-3d-desc">от 4 990 ₽ · от 10 дней</span>
                 </button>
                 <button type="button" class="btn-3d" data-type="webapp">
-                  <span class="btn-3d-icon">📱</span>
+                  <span class="btn-3d-icon">
+                    <svg class="btn-3d-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  </span>
                   <span class="btn-3d-title">Web-сервис / App</span>
-                  <span class="btn-3d-desc">от 55 000 ₽ · от 18 дней</span>
+                  <span class="btn-3d-desc">от 3 990 ₽ · от 8 дней</span>
                 </button>
                 <button type="button" class="btn-3d" data-type="redesign">
-                  <span class="btn-3d-icon">✨</span>
+                  <span class="btn-3d-icon">
+                    <svg class="btn-3d-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                  </span>
                   <span class="btn-3d-title">Редизайн сайта</span>
-                  <span class="btn-3d-desc">от 25 000 ₽ · от 7 дней</span>
+                  <span class="btn-3d-desc">от 990 ₽ · от 2 дней</span>
                 </button>
               </div>
             </div>
@@ -286,10 +305,22 @@ studio.<span class="cfn">launch</span>();</code></pre>
             <div class="config-group">
               <label class="config-title">2. Визуальная эстетика</label>
               <div class="btn-3d-grid mini" id="cfgStyleGroup">
-                <button type="button" class="btn-3d on" data-style="cyber">🌌 Dark Cyber & Glass</button>
-                <button type="button" class="btn-3d" data-style="minimal">⚪ Clean Minimalism</button>
-                <button type="button" class="btn-3d" data-style="editorial">🎨 Bold Editorial</button>
-                <button type="button" class="btn-3d" data-style="luxury">💎 High-Tech Luxury</button>
+                <button type="button" class="btn-3d on" data-style="cyber">
+                  <svg class="style-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                  <span>Dark Cyber & Glass</span>
+                </button>
+                <button type="button" class="btn-3d" data-style="minimal">
+                  <svg class="style-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+                  <span>Clean Minimalism</span>
+                </button>
+                <button type="button" class="btn-3d" data-style="editorial">
+                  <svg class="style-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                  <span>Bold Editorial</span>
+                </button>
+                <button type="button" class="btn-3d" data-style="luxury">
+                  <svg class="style-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9z"/><path d="M11 3 8 9l4 13 4-13-3-6"/></svg>
+                  <span>High-Tech Luxury</span>
+                </button>
               </div>
             </div>
 
@@ -298,28 +329,28 @@ studio.<span class="cfn">launch</span>();</code></pre>
               <label class="config-title">3. Интерактивные модули (мультивыбор)</label>
               <div class="btn-3d-grid" id="cfgModulesGroup">
                 <button type="button" class="btn-3d toggle-3d on" data-mod="anim">
-                  <span class="tgl-check">✓</span>
-                  <span class="tgl-text">3D-анимации и WebGL (+6 000 ₽)</span>
+                  <span class="tgl-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tgl-text">3D-анимации и WebGL (+350 ₽)</span>
                 </button>
                 <button type="button" class="btn-3d toggle-3d on" data-mod="bot">
-                  <span class="tgl-check">✓</span>
-                  <span class="tgl-text">Онлайн-чат + Telegram-бот (+8 000 ₽)</span>
+                  <span class="tgl-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tgl-text">Онлайн-чат + Telegram-бот (+450 ₽)</span>
                 </button>
                 <button type="button" class="btn-3d toggle-3d" data-mod="pay">
-                  <span class="tgl-check">✓</span>
-                  <span class="tgl-text">Эквайринг и платёжный шлюз (+7 000 ₽)</span>
+                  <span class="tgl-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tgl-text">Эквайринг и платёжный шлюз (+400 ₽)</span>
                 </button>
                 <button type="button" class="btn-3d toggle-3d on" data-mod="sec">
-                  <span class="tgl-check">✓</span>
-                  <span class="tgl-text">Turnstile защита от ботов (+4 000 ₽)</span>
+                  <span class="tgl-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tgl-text">Turnstile защита от ботов (+200 ₽)</span>
                 </button>
                 <button type="button" class="btn-3d toggle-3d" data-mod="cms">
-                  <span class="tgl-check">✓</span>
-                  <span class="tgl-text">Панель управления (CMS / Админка) (+12 000 ₽)</span>
+                  <span class="tgl-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tgl-text">Панель управления (CMS / Админка) (+550 ₽)</span>
                 </button>
                 <button type="button" class="btn-3d toggle-3d on" data-mod="speed">
-                  <span class="tgl-check">✓</span>
-                  <span class="tgl-text">Турбо-скорость 100/100 PageSpeed (+5 000 ₽)</span>
+                  <span class="tgl-check"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span class="tgl-text">Турбо-скорость 100/100 PageSpeed (+250 ₽)</span>
                 </button>
               </div>
             </div>
@@ -328,9 +359,18 @@ studio.<span class="cfn">launch</span>();</code></pre>
             <div class="config-group">
               <label class="config-title">4. Темп реализации</label>
               <div class="btn-3d-grid mini" id="cfgSpeedGroup">
-                <button type="button" class="btn-3d on" data-speed="std">Стандартный срок</button>
-                <button type="button" class="btn-3d" data-speed="fast">Приоритет (-30% времени)</button>
-                <button type="button" class="btn-3d" data-speed="turbo">🔥 Turbo-спринт (до 72 ч)</button>
+                <button type="button" class="btn-3d on" data-speed="std">
+                  <svg class="speed-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Стандартный срок</span>
+                </button>
+                <button type="button" class="btn-3d" data-speed="fast">
+                  <svg class="speed-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  <span>Приоритет (-30% времени)</span>
+                </button>
+                <button type="button" class="btn-3d" data-speed="turbo">
+                  <svg class="speed-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>
+                  <span>Turbo-спринт (до 72 ч)</span>
+                </button>
               </div>
             </div>
           </div>
@@ -355,9 +395,9 @@ studio.<span class="cfn">launch</span>();</code></pre>
                     <span class="cfg-wire-line long"></span>
                     <span class="cfg-wire-line short"></span>
                     <div class="cfg-wire-tags" id="cfgWireTags">
-                      <span>⚡ Лендинг</span>
-                      <span>🌌 Cyber</span>
-                      <span>3D Motion</span>
+                      <span>Лендинг</span>
+                      <span>Cyber Glass</span>
+                      <span>3D WebGL</span>
                     </div>
                   </div>
                 </div>
@@ -365,11 +405,11 @@ studio.<span class="cfn">launch</span>();</code></pre>
 
               <div class="cfg-price-box">
                 <div class="cfg-price-lbl">Расчётная стоимость</div>
-                <div class="cfg-price-val"><span id="cfgPriceNum">33 900</span> <small>₽</small></div>
+                <div class="cfg-price-val"><span id="cfgPriceNum">2 740</span> <small>₽</small></div>
                 <div class="cfg-meta-row">
                   <div class="cfg-meta-item">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    <span id="cfgDays">Срок: ~7-9 раб. дней</span>
+                    <span id="cfgDays">Срок: ~4-5 раб. дней</span>
                   </div>
                   <div class="cfg-meta-item">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
